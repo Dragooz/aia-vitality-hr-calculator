@@ -6,9 +6,39 @@ const TIERS = [
   { points:  50, rules: [{ pct: 0.80, mins: 10 }, { pct: 0.60, mins: 30 }] },
 ];
 
-const MIN_AGE = 13;
-const MAX_AGE = 100;
-const IMPLAUSIBLE_BPM = 230;
+// One definition per field: bounds, and what to say when they are broken.
+// Ranges are chosen from what is physiologically real, not round numbers.
+const LIMITS = {
+  age: {
+    min: 13, max: 100,
+    low:  "Age looks too low. Enter 13 or above.",
+    high: "Age looks too high. Enter 100 or below.",
+    empty: "Enter your age to work out your heart rate targets.",
+  },
+  bpm: {
+    // 230 is above the highest reliably recorded human heart rate; past that
+    // it is a sensor fault. Below 40 is not exercise.
+    min: 40, max: 230,
+    low:  "That is below an exercising heart rate. Check the reading.",
+    high: "Above 230 bpm is a sensor fault, not an effort. Wrist sensors often double-count during weights or cycling.",
+    empty: "Enter the average heart rate your watch recorded.",
+  },
+  mins: {
+    min: 1, max: 600,
+    low:  "Enter at least 1 minute.",
+    high: "Over 10 hours is longer than one unbroken session.",
+    empty: "Enter how long the workout lasted.",
+  },
+  steps: {
+    min: 0, max: 100000,
+    low:  "Steps cannot be negative.",
+    high: "Over 100,000 steps in a day is beyond a tracker's plausible range.",
+    empty: "Enter your step count.",
+  },
+};
+
+const MIN_AGE = LIMITS.age.min;
+const MAX_AGE = LIMITS.age.max;
 
 // Step thresholds from AIA's points table, high to low.
 const STEP_TIERS = [
@@ -32,9 +62,34 @@ const totalEl = document.getElementById("total");
 
 const bpmFor = (age, pct) => Math.round((220 - age) * pct);
 
-function readInt(el, lo, hi) {
-  const n = parseInt(el.value, 10);
-  return Number.isFinite(n) && n >= lo && n <= hi ? n : null;
+// Returns {value} when good, or {error} naming what is wrong. Never both.
+function validate(el, key) {
+  const lim = LIMITS[key];
+  const raw = el.value.trim();
+
+  if (raw === "") return { error: lim.empty, empty: true };
+  if (!/^-?\d+$/.test(raw)) return { error: "Enter a whole number." };
+
+  const n = Number(raw);
+  if (n < lim.min) return { error: lim.low };
+  if (n > lim.max) return { error: lim.high };
+  return { value: n };
+}
+
+// Mark the input and show the message under it.
+function applyState(el, result) {
+  const msgEl = document.getElementById(el.id + "-msg");
+  const bad = result.error !== undefined && !result.empty;
+
+  el.classList.toggle("invalid", bad);
+  el.setAttribute("aria-invalid", bad ? "true" : "false");
+
+  if (msgEl) {
+    msgEl.textContent = result.error || "";
+    msgEl.classList.toggle("show", result.error !== undefined);
+    msgEl.classList.toggle("hard", bad);
+  }
+  return result.value ?? null;
 }
 
 // Which rule inside a tier is closest for this session, and what it needs.
@@ -114,24 +169,67 @@ function renderSteps(steps, hrPoints) {
     ? `points &nbsp;·&nbsp; <b>${nf.format(next.min - steps)}</b> more for ${next.points}`
     : "points &nbsp;·&nbsp; top step tier";
 
-  // Heart rate and step points do NOT stack: the day pays the higher of the
-  // two, capped at 150.
-  const best = Math.max(hrPoints, pts);
-  const from = pts > hrPoints ? "from steps" : pts === hrPoints && pts > 0 ? "either way" : "from your workout";
-  totalEl.innerHTML = `<span>Today</span><b>${best}</b><span>points ${best > 0 ? from : ""}</span>`;
+  renderTotal(hrPoints, pts);
   return pts;
+}
+
+function renderTotal(hrPoints, stepPts) {
+  // Heart rate and step points do NOT stack. AIA pays the higher of the two.
+  const awarded = Math.max(hrPoints, stepPts);
+  const naive = hrPoints + stepPts;
+  const bothEarned = hrPoints > 0 && stepPts > 0;
+
+  const source = hrPoints > stepPts ? "your workout"
+               : stepPts > hrPoints ? "your steps"
+               : "either one on its own";
+
+  // Only worth showing the crossed-out sum when both actually scored - that
+  // is the only case where someone would expect them to add up.
+  const tally = bothEarned
+    ? `<div class="tally">
+         <span class="tally-part">${hrPoints}<i>workout</i></span>
+         <span class="tally-op">+</span>
+         <span class="tally-part">${stepPts}<i>steps</i></span>
+         <span class="tally-op">=</span>
+         <span class="tally-wrong">${naive}</span>
+         <span class="tally-arrow">&rarr;</span>
+         <span class="tally-right">${awarded}</span>
+       </div>`
+    : "";
+
+  const lesson = bothEarned
+    ? `<p class="total-lesson"><b>They do not add up.</b> AIA pays the higher of the two, so today is <b>${awarded}</b>, not ${naive}. You earned it from ${source}.</p>`
+    : awarded > 0
+      ? `<p class="total-lesson">Earned from ${source}. Heart rate and steps never add together &mdash; AIA pays whichever is higher.</p>`
+      : `<p class="total-lesson">Nothing yet today. You need 5,000 steps, or a workout that reaches the first heart rate tier.</p>`;
+
+  totalEl.innerHTML = `
+    <div class="total-head">
+      <span class="total-label">Today you earn</span>
+      <span class="total-value ${awarded === 0 ? "zero" : ""}">${awarded}</span>
+      <span class="total-unit">of 150 max</span>
+    </div>
+    ${tally}
+    ${lesson}`;
 }
 
 let lastPoints = null;
 
 function update() {
-  const age = readInt(ageEl, MIN_AGE, MAX_AGE);
-  const bpm = readInt(bpmEl, 40, IMPLAUSIBLE_BPM);
-  const mins = readInt(minsEl, 1, 600);
+  const age = applyState(ageEl, validate(ageEl, "age"));
+  const bpm = applyState(bpmEl, validate(bpmEl, "bpm"));
+  const mins = applyState(minsEl, validate(minsEl, "mins"));
+  const steps = applyState(stepsEl, validate(stepsEl, "steps"));
 
   if (age === null) {
-    hintEl.textContent = `Enter an age between ${MIN_AGE} and ${MAX_AGE}.`;
+    hintEl.textContent = "Enter your age to see your heart rate targets.";
     hintEl.classList.add("warn");
+    pointsEl.textContent = "—";
+    pointsEl.classList.add("zero");
+    sayEl.textContent = "";
+    resultEl.style.setProperty("--fill", 0);
+    ladderEl.innerHTML = "";
+    renderSteps(steps, 0);
     return;
   }
 
@@ -147,7 +245,7 @@ function update() {
       : "Enter how long the workout lasted.";
     resultEl.style.setProperty("--fill", 0);
     renderLadder(age, bpm ?? 0, mins ?? 0, 0);
-    renderSteps(readInt(stepsEl, 0, 100000), 0);
+    renderSteps(steps, 0);
     return;
   }
 
@@ -175,7 +273,7 @@ function update() {
   }
 
   renderLadder(age, bpm, mins, points);
-  renderSteps(readInt(stepsEl, 0, 100000), points);
+  renderSteps(steps, points);
 }
 
 [ageEl, bpmEl, minsEl, stepsEl].forEach(el => el.addEventListener("input", update));

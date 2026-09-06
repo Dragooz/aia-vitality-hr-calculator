@@ -190,7 +190,8 @@
                             step="1"
                             value="30"
                             inputmode="numeric"
-                        />
+                        / aria-describedby="age-msg">
+        <p class="msg" id="age-msg" role="status"></p>
                     </div>
                     <div class="field">
                         <label for="bpm">Avg heart rate</label>
@@ -198,11 +199,12 @@
                             type="number"
                             id="bpm"
                             min="40"
-                            max="240"
+                            max="230"
                             step="1"
                             value="145"
                             inputmode="numeric"
-                        />
+                        / aria-describedby="bpm-msg">
+        <p class="msg" id="bpm-msg" role="status"></p>
                     </div>
                     <div class="field">
                         <label for="mins">Minutes</label>
@@ -214,7 +216,8 @@
                             step="1"
                             value="35"
                             inputmode="numeric"
-                        />
+                        / aria-describedby="mins-msg">
+        <p class="msg" id="mins-msg" role="status"></p>
                     </div>
                 </div>
                 <p class="hint" id="hint"></p>
@@ -241,7 +244,8 @@
                             step="100"
                             value="8000"
                             inputmode="numeric"
-                        />
+                        / aria-describedby="steps-msg">
+        <p class="msg" id="steps-msg" role="status"></p>
                     </div>
                     <div class="steps-out">
                         <div class="steps-pts" id="steps-pts">50</div>

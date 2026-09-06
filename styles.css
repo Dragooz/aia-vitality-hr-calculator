@@ -324,6 +324,54 @@ input[type="number"]:focus-visible {
 .rung.next .rung-tick { color: var(--accent-ink); }
 .rung .rung-tick { color: transparent; }
 
+/* ---- validation ---- */
+
+.msg {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--muted);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height .2s ease, opacity .2s ease, margin-top .2s ease;
+}
+
+.msg.show {
+  max-height: 4.5em;
+  opacity: 1;
+  margin-top: 5px;
+}
+
+/* A real range error, as opposed to an empty field prompt. */
+.msg.hard { color: var(--accent-ink); font-weight: 600; }
+
+input[type="number"].invalid {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+input[type="number"].invalid:focus-visible {
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-3px); }
+  75%      { transform: translateX(3px); }
+}
+
+input[type="number"].invalid { animation: shake .22s ease; }
+
+/* Chrome/Safari spinners crowd a 3-digit field; the arrows add nothing here. */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
 /* ---- steps: secondary to heart rate ---- */
 
 .steps-card {
@@ -368,29 +416,107 @@ input[type="number"]:focus-visible {
 .steps-note b { color: var(--ink); font-weight: 600; }
 
 .total {
+  padding-top: 14px;
+  border-top: 1px dashed var(--hairline);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.total-head {
   display: flex;
   align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  padding-top: 12px;
-  border-top: 1px dashed var(--hairline);
-  font-size: 13.5px;
-  font-weight: 600;
-  letter-spacing: .03em;
+}
+
+.total-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-.total span:last-child { text-transform: none; letter-spacing: 0; font-weight: 400; }
-
-.total b {
-  font-size: 26px;
+.total-value {
+  font-size: 38px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -.02em;
+  line-height: 1;
+  letter-spacing: -.03em;
   color: var(--ink);
-  text-transform: none;
 }
+
+.total-value.zero { color: var(--muted); opacity: .45; }
+.total-unit { font-size: 12.5px; color: var(--muted); }
+
+/* The arithmetic a beginner expects, shown next to what AIA actually pays. */
+.tally {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 11px 15px;
+  background: var(--ground);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tally-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.tally-part i {
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.tally-op { font-size: 15px; font-weight: 600; color: var(--muted); }
+
+.tally-wrong {
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  opacity: .65;
+}
+
+.tally-arrow { font-size: 16px; color: var(--accent); font-weight: 700; }
+
+.tally-right {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  letter-spacing: -.02em;
+}
+
+.total-lesson {
+  margin: 0;
+  max-width: 42ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.total-lesson b { color: var(--ink); font-weight: 600; }
 
 /* ---- collapsible detail ---- */
 
@@ -488,6 +614,10 @@ footer a:hover { text-decoration-color: var(--accent-ink); }
   .steps-row { flex-direction: column; align-items: stretch; gap: 11px; }
   .steps-row input[type="number"] { width: 100%; }
   .steps-out { padding-bottom: 0; }
+  .tally { gap: 7px; padding: 10px 11px; }
+  .tally-part, .tally-wrong { font-size: 17px; }
+  .tally-right { font-size: 20px; }
+  .total-value { font-size: 33px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
