@@ -1,394 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AIA Vitality Heart Rate Calculator</title>
+<meta name="description" content="Work out the heart rate and session length you need for 50, 100 or 150 AIA Vitality heart rate points. Unofficial hobby tool.">
+<meta name="theme-color" content="#D31145">
+
+<link rel="icon" href="/assets/favicon/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="/assets/favicon/site.webmanifest">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="AIA Vitality Heart Rate Calculator">
+<meta property="og:description" content="How long, and how hard, for 50 / 100 / 150 heart rate points. Unofficial hobby tool.">
+<meta property="og:image" content="/assets/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-619K2BZKS6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-619K2BZKS6');
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
-<style>
-  :root {
-    --ground: #FCFCFD;
-    --surface: #FFFFFF;
-    --surface-sunk: #F4F6F8;
-    --ink: #1A1D23;
-    --muted: #5C6370;
-    --hairline: #E4E7EC;
-    --accent: #D31145;
-    --accent-soft: #FDF0F3;
-    --accent-ink: #D31145;
-    --ok: #0F7B4F;
-    --ok-soft: #ECF7F1;
-    --shadow: 0 1px 2px rgba(26, 29, 35, .06), 0 1px 8px rgba(26, 29, 35, .04);
-    --sans: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --ground: #14161A;
-      --surface: #1C1F25;
-      --surface-sunk: #232730;
-      --ink: #EDEFF2;
-      --muted: #9BA3B0;
-      --hairline: #2E333C;
-      --accent: #F04A72;
-      --accent-soft: #2B1922;
-      --accent-ink: #FF7C9B;
-      --ok: #4ECB8F;
-      --ok-soft: #16281F;
-      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 1px 8px rgba(0, 0, 0, .25);
-    }
-  }
-
-  :root[data-theme="dark"] {
-    --ground: #14161A;
-    --surface: #1C1F25;
-    --surface-sunk: #232730;
-    --ink: #EDEFF2;
-    --muted: #9BA3B0;
-    --hairline: #2E333C;
-    --accent: #F04A72;
-    --accent-soft: #2B1922;
-    --accent-ink: #FF7C9B;
-    --ok: #4ECB8F;
-    --ok-soft: #16281F;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 1px 8px rgba(0, 0, 0, .25);
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    background: var(--ground);
-    color: var(--ink);
-    font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .page {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 32px 20px 64px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
-
-  /* ---- masthead ---- */
-
-  .masthead { display: flex; flex-direction: column; gap: 8px; }
-
-  .eyebrow {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    color: var(--accent-ink);
-  }
-
-  h1 {
-    margin: 0;
-    font-size: 30px;
-    line-height: 1.15;
-    font-weight: 700;
-    letter-spacing: -.015em;
-    text-wrap: balance;
-  }
-
-  .standfirst {
-    margin: 0;
-    color: var(--muted);
-    max-width: 56ch;
-  }
-
-  /* ---- age entry ---- */
-
-  .entry {
-    background: var(--surface);
-    border: 1px solid var(--hairline);
-    border-radius: 10px;
-    box-shadow: var(--shadow);
-    padding: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 16px 24px;
-  }
-
-  .field { display: flex; flex-direction: column; gap: 6px; }
-
-  label {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: .02em;
-    color: var(--muted);
-  }
-
-  input[type="number"] {
-    font-family: inherit;
-    font-size: 22px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    width: 110px;
-    padding: 8px 12px;
-    color: var(--ink);
-    background: var(--ground);
-    border: 1px solid var(--hairline);
-    border-radius: 7px;
-  }
-
-  input[type="number"]:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-    border-color: var(--accent);
-  }
-
-  .maxhr {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding-bottom: 4px;
-  }
-
-  .maxhr-value {
-    font-size: 22px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
-  }
-
-  .maxhr-label { font-size: 13px; color: var(--muted); }
-
-  .formula {
-    flex-basis: 100%;
-    margin: 0;
-    padding-top: 4px;
-    border-top: 1px dashed var(--hairline);
-    font-size: 13px;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* ---- zones ---- */
-
-  h2 {
-    margin: 0 0 12px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: .09em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .zones {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-
-  .zone {
-    background: var(--surface);
-    border: 1px solid var(--hairline);
-    border-top: 3px solid var(--accent);
-    border-radius: 8px;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .zone-pct {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--accent-ink);
-    letter-spacing: .02em;
-  }
-
-  .zone-bpm {
-    font-size: 27px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.15;
-    letter-spacing: -.02em;
-  }
-
-  .zone-unit { font-size: 13px; color: var(--muted); }
-
-  /* ---- points table ---- */
-
-  .table-wrap { overflow-x: auto; }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-variant-numeric: tabular-nums;
-  }
-
-  caption {
-    caption-side: bottom;
-    padding-top: 10px;
-    font-size: 13px;
-    color: var(--muted);
-    text-align: left;
-  }
-
-  th {
-    text-align: left;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: .07em;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 0 12px 8px 0;
-    border-bottom: 1px solid var(--hairline);
-    white-space: nowrap;
-  }
-
-  th.points-col, td.points-col { text-align: right; padding-right: 0; }
-
-  td {
-    padding: 10px 12px 10px 0;
-    border-bottom: 1px solid var(--hairline);
-    white-space: nowrap;
-  }
-
-  tr.tier-start td { border-top: 2px solid var(--hairline); }
-  tr.tier-start:first-child td { border-top: none; }
-
-  td.dur { font-weight: 600; }
-  td.bpm { color: var(--muted); }
-  td.bpm b { color: var(--ink); font-weight: 600; }
-
-  td.points-col {
-    font-size: 19px;
-    font-weight: 700;
-    color: var(--accent-ink);
-    vertical-align: middle;
-  }
-
-  tbody tr.hit td { background: var(--ok-soft); }
-  tbody tr.hit td.dur::after {
-    content: "reached";
-    margin-left: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-    color: var(--ok);
-  }
-
-  /* ---- session checker ---- */
-
-  .checker {
-    background: var(--surface-sunk);
-    border: 1px solid var(--hairline);
-    border-radius: 10px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .checker-inputs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px 24px;
-  }
-
-  .verdict {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding-top: 14px;
-    border-top: 1px solid var(--hairline);
-  }
-
-  .verdict-points {
-    font-size: 34px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    letter-spacing: -.02em;
-    color: var(--accent-ink);
-  }
-
-  .verdict-points.zero { color: var(--muted); }
-  .verdict-text { color: var(--muted); font-size: 15px; max-width: 44ch; }
-  .verdict-text b { color: var(--ink); font-weight: 600; }
-
-  /* ---- notes + footer ---- */
-
-  .notes {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 14px;
-    color: var(--muted);
-    padding-left: 18px;
-    margin: 0;
-  }
-
-  .notes li { padding-left: 4px; }
-  .notes b { color: var(--ink); font-weight: 600; }
-
-  footer {
-    border-top: 1px solid var(--hairline);
-    padding-top: 20px;
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--muted);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  footer strong { color: var(--ink); }
-  footer a { color: var(--accent-ink); }
-
-  @media (max-width: 520px) {
-    h1 { font-size: 25px; }
-    .zones { grid-template-columns: 1fr; }
-    .zone { border-top-width: 1px; border-left: 3px solid var(--accent); }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    tbody tr td, .verdict-points { transition: background-color .15s ease, color .15s ease; }
-  }
-</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
 <div class="page">
 
   <header class="masthead">
-    <div class="eyebrow">Unofficial reference</div>
+    <img class="mark" src="/assets/favicon/android-chrome-192x192.png" alt="" width="32" height="32">
     <h1>AIA Vitality heart rate points</h1>
-    <p class="standfirst">Enter your age to get the beats per minute you need to hold, and how long you need to hold it, for 50, 100 or 150 points in a day.</p>
+    <div class="chip">Unofficial</div>
   </header>
 
-  <section class="entry">
-    <div class="field">
-      <label for="age">Your age</label>
-      <input type="number" id="age" min="10" max="100" step="1" value="30" inputmode="numeric">
+  <section class="panel">
+    <div class="inputs">
+      <div class="field">
+        <label for="age">Your age</label>
+        <input type="number" id="age" min="13" max="100" step="1" value="30" inputmode="numeric">
+      </div>
+      <div class="maxhr"><b id="maxhr">190</b> bpm maximum</div>
     </div>
-    <div class="maxhr">
-      <div class="maxhr-value" id="maxhr">190 bpm</div>
-      <div class="maxhr-label">Age-related maximum heart rate</div>
+
+    <div id="zones-wrap">
+      <div class="zones" id="zones"></div>
     </div>
-    <p class="formula" id="formula">220 &minus; 30 = 190 bpm</p>
+
+    <p class="note" id="note">220 &minus; 30 = 190 bpm</p>
   </section>
 
-  <section>
-    <h2>Your target zones</h2>
-    <div class="zones" id="zones"></div>
-  </section>
-
-  <section>
+  <section id="table-section">
     <h2>What each session earns</h2>
     <div class="table-wrap">
       <table>
-        <caption>Heart rate points are awarded once per day. Only the highest tier you reach counts.</caption>
         <thead>
           <tr>
             <th>Hold at least</th>
             <th>For at least</th>
-            <th class="points-col">Points</th>
+            <th class="pts">Points</th>
           </tr>
         </thead>
         <tbody id="tiers"></tbody>
@@ -396,179 +78,43 @@
     </div>
   </section>
 
-  <section class="checker">
-    <h2 style="margin:0">Check a workout you did</h2>
-    <div class="checker-inputs">
+  <section class="panel">
+    <h2 style="margin:0">Check a workout</h2>
+    <div class="inputs">
       <div class="field">
-        <label for="did-bpm">Average heart rate</label>
-        <input type="number" id="did-bpm" min="40" max="240" step="1" value="145" inputmode="numeric">
+        <label for="bpm">Average bpm</label>
+        <input type="number" id="bpm" min="40" max="240" step="1" value="145" inputmode="numeric">
       </div>
       <div class="field">
-        <label for="did-mins">Minutes</label>
-        <input type="number" id="did-mins" min="0" max="600" step="1" value="35" inputmode="numeric">
+        <label for="mins">Minutes</label>
+        <input type="number" id="mins" min="0" max="600" step="1" value="35" inputmode="numeric">
       </div>
     </div>
-    <div class="verdict">
-      <div class="verdict-points" id="verdict-points">100</div>
+    <div class="verdict" id="verdict">
+      <div class="verdict-pts" id="verdict-pts">100</div>
       <p class="verdict-text" id="verdict-text"></p>
     </div>
   </section>
 
-  <section>
-    <h2>Before you trust the number</h2>
-    <ul class="notes">
-      <li>AIA counts your <b>average</b> heart rate across the session, not your peak. A hard sprint inside an easy walk will not carry the average.</li>
-      <li>The session must be one unbroken workout. Two 15-minute walks are not a 30-minute session.</li>
-      <li>Heart rate points cap at <b>15,000 per membership year</b>. Step points cap separately at 10,000.</li>
-      <li>Your watch decides what it reports to AIA. If its numbers differ from this page, your watch is what gets you the points.</li>
-    </ul>
-  </section>
-
   <footer>
-    <p style="margin:0"><strong>This is a hobby project. It is not from AIA.</strong> I built it for myself as a quick reference and put it online in case it saves someone else the arithmetic. It has no connection to AIA Bhd, is not endorsed by them, and earns nothing from it.</p>
-    <p style="margin:0">The thresholds and the <span style="font-variant-numeric:tabular-nums">220 &minus; age</span> formula are copied from AIA&rsquo;s own published table on the <a href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html" target="_blank" rel="noopener">Dynamic Weekly Challenge page</a>. AIA can change them at any time, and this page will not know. Check the official page before you count on a number here.</p>
-    <p style="margin:0">Nothing you type is saved or sent anywhere. It stays in your browser.</p>
-    <p style="margin:0">General fitness reference only, not medical advice. Talk to a doctor before starting hard exercise, especially if you have a heart condition or take medication that affects your heart rate.</p>
+    <p><strong>This is a hobby project, not from AIA.</strong> No connection to AIA Bhd, no endorsement, no money made from it.</p>
+
+    <ul>
+      <li>AIA counts your <b>average</b> heart rate over <b>one unbroken session</b>, once per day. Only the highest tier counts.</li>
+      <li>Heart rate points cap at <b>15,000 per membership year</b>, separately from 10,000 step points.</li>
+      <li><b>220 &minus; age</b> is a population average. A lab-measured maximum can sit 10&ndash;20 bpm either side, but AIA credits against this formula regardless.</li>
+      <li>Your watch decides what it reports. If its numbers differ from this page, your watch is what earns the points.</li>
+    </ul>
+
+    <p>All thresholds and the formula come from AIA&rsquo;s <a href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html" target="_blank" rel="noopener">Dynamic Weekly Challenge page</a>, section &ldquo;Heart rate &ndash; once per day&rdquo;, transcribed 6 September 2026. Targets are rounded to the nearest beat. AIA can change these without notice and this page will not know &mdash; check theirs before you rely on a number here.</p>
+
+    <p>Your age and heart rate stay in your browser. They are never stored or transmitted. This site uses Google Analytics, which sets cookies and records page visits.</p>
+
+    <p>General fitness reference, not medical advice. Talk to a doctor before starting hard exercise, especially with a heart condition or medication affecting your heart rate.</p>
   </footer>
 
 </div>
 
-<script>
-  // Thresholds copied from AIA's published table. minPct is the fraction of
-  // age-related max heart rate; minMins is session length. Ordered high to low
-  // so the first match in checkSession() is the best tier.
-  const TIERS = [
-    { points: 150, rules: [ { minPct: 0.80, minMins: 30 }, { minPct: 0.70, minMins: 60 }, { minPct: 0.60, minMins: 90 } ] },
-    { points: 100, rules: [ { minPct: 0.80, minMins: 20 }, { minPct: 0.70, minMins: 30 }, { minPct: 0.60, minMins: 60 } ] },
-    { points:  50, rules: [ { minPct: 0.80, minMins: 10 }, { minPct: 0.60, minMins: 30 } ] },
-  ];
-
-  const ageInput = document.getElementById("age");
-  const bpmInput = document.getElementById("did-bpm");
-  const minsInput = document.getElementById("did-mins");
-  const maxhrEl = document.getElementById("maxhr");
-  const formulaEl = document.getElementById("formula");
-  const zonesEl = document.getElementById("zones");
-  const tiersEl = document.getElementById("tiers");
-  const verdictPointsEl = document.getElementById("verdict-points");
-  const verdictTextEl = document.getElementById("verdict-text");
-
-  // AIA rounds nothing publicly, so round to the nearest beat — a bpm target
-  // with a decimal is unusable on a watch.
-  const bpmFor = (age, pct) => Math.round((220 - age) * pct);
-
-  function readAge() {
-    const age = parseInt(ageInput.value, 10);
-    return Number.isFinite(age) && age >= 10 && age <= 100 ? age : null;
-  }
-
-  function renderZones(age) {
-    zonesEl.innerHTML = [0.60, 0.70, 0.80].map(pct => `
-      <div class="zone">
-        <div class="zone-pct">${Math.round(pct * 100)}% of max</div>
-        <div class="zone-bpm">${bpmFor(age, pct)}</div>
-        <div class="zone-unit">beats per minute or higher</div>
-      </div>`).join("");
-  }
-
-  function renderTiers(age, didBpm, didMins) {
-    const rows = [];
-    for (const tier of TIERS) {
-      tier.rules.forEach((rule, ruleIndex) => {
-        const targetBpm = bpmFor(age, rule.minPct);
-        const hit = didBpm !== null && didMins !== null && didBpm >= targetBpm && didMins >= rule.minMins;
-        rows.push(`
-          <tr class="${ruleIndex === 0 ? "tier-start" : ""}${hit ? " hit" : ""}">
-            <td class="bpm"><b>${targetBpm} bpm</b> &middot; ${Math.round(rule.minPct * 100)}% of max</td>
-            <td class="dur">${rule.minMins} min</td>
-            ${ruleIndex === 0 ? `<td class="points-col" rowspan="${tier.rules.length}">${tier.points}</td>` : ""}
-          </tr>`);
-      });
-    }
-    tiersEl.innerHTML = rows.join("");
-  }
-
-  function checkSession(age, didBpm, didMins) {
-    for (const tier of TIERS) {
-      for (const rule of tier.rules) {
-        if (didBpm >= bpmFor(age, rule.minPct) && didMins >= rule.minMins) {
-          return { points: tier.points, rule };
-        }
-      }
-    }
-    return { points: 0, rule: null };
-  }
-
-  // The nearest tier the session missed, and what it would take to reach it.
-  function shortfallAdvice(age, didBpm, didMins, earnedPoints) {
-    let best = null;
-    for (const tier of TIERS) {
-      if (tier.points <= earnedPoints) continue;
-      for (const rule of tier.rules) {
-        const targetBpm = bpmFor(age, rule.minPct);
-        const extraMins = Math.max(0, rule.minMins - didMins);
-        const extraBpm = Math.max(0, targetBpm - didBpm);
-        // Rank by how much is missing; minutes are the easier gap to close, so
-        // weight beats heavier than minutes rather than comparing raw numbers.
-        const cost = extraMins + extraBpm * 3;
-        if (best === null || cost < best.cost) {
-          best = { cost, extraMins, extraBpm, targetBpm, rule, points: tier.points };
-        }
-      }
-    }
-    if (best === null) return "";
-    const needs = [];
-    if (best.extraBpm > 0) needs.push(`<b>${best.extraBpm} bpm</b> harder`);
-    if (best.extraMins > 0) needs.push(`<b>${best.extraMins} more minutes</b>`);
-    return ` Closest miss is ${best.points} points: ${needs.join(" and ")} — that tier wants ${best.rule.minMins} minutes at ${best.targetBpm} bpm.`;
-  }
-
-  function update() {
-    const age = readAge();
-    if (age === null) {
-      maxhrEl.textContent = "—";
-      formulaEl.textContent = "Enter an age between 10 and 100.";
-      zonesEl.innerHTML = "";
-      tiersEl.innerHTML = "";
-      verdictPointsEl.textContent = "—";
-      verdictPointsEl.classList.add("zero");
-      verdictTextEl.textContent = "";
-      return;
-    }
-
-    const maxHr = 220 - age;
-    maxhrEl.textContent = `${maxHr} bpm`;
-    formulaEl.innerHTML = `220 &minus; ${age} = ${maxHr} bpm`;
-    renderZones(age);
-
-    const didBpm = parseInt(bpmInput.value, 10);
-    const didMins = parseInt(minsInput.value, 10);
-    const sessionEntered = Number.isFinite(didBpm) && Number.isFinite(didMins) && didBpm > 0 && didMins > 0;
-
-    renderTiers(age, sessionEntered ? didBpm : null, sessionEntered ? didMins : null);
-
-    if (!sessionEntered) {
-      verdictPointsEl.textContent = "—";
-      verdictPointsEl.classList.add("zero");
-      verdictTextEl.innerHTML = "Enter a heart rate and a length to check a session.";
-      return;
-    }
-
-    const { points, rule } = checkSession(age, didBpm, didMins);
-    verdictPointsEl.textContent = points;
-    verdictPointsEl.classList.toggle("zero", points === 0);
-
-    const pctOfMax = Math.round((didBpm / maxHr) * 100);
-    const summary = `<b>${didMins} min</b> at <b>${didBpm} bpm</b> is ${pctOfMax}% of your maximum.`;
-
-    if (points === 0) {
-      verdictTextEl.innerHTML = `${summary} That is under every threshold.${shortfallAdvice(age, didBpm, didMins, 0)}`;
-    } else {
-      const cleared = `It clears ${rule.minMins} minutes at ${Math.round(rule.minPct * 100)}% of max.`;
-      verdictTextEl.innerHTML = `${summary} ${cleared}${shortfallAdvice(age, didBpm, didMins, points)}`;
-    }
-  }
-
-  [ageInput, bpmInput, minsInput].forEach(input => input.addEventListener("input", update));
-  update();
-</script>
+<script src="app.js"></script>
+</body>
+</html>
