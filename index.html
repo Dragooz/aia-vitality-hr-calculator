@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AIA Vitality Heart Rate Calculator</title>
-<meta name="description" content="Work out the heart rate and session length you need for 50, 100 or 150 AIA Vitality heart rate points. Unofficial hobby tool.">
+<title>AIA Vitality Heart Rate Points Calculator &amp; Guide</title>
+<meta name="description" content="Enter your age to see the exact bpm and workout length needed for 50, 100 or 150 AIA Vitality heart rate points. Includes how points are counted, daily limits and yearly caps. Unofficial guide.">
 <meta name="theme-color" content="#D31145">
 
 <link rel="icon" href="/assets/favicon/favicon.ico" sizes="any">
@@ -14,12 +14,16 @@
 <link rel="manifest" href="/assets/favicon/site.webmanifest">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="AIA Vitality Heart Rate Calculator">
-<meta property="og:description" content="How long, and how hard, for 50 / 100 / 150 heart rate points. Unofficial hobby tool.">
-<meta property="og:image" content="/assets/og-image.png">
+<meta property="og:title" content="AIA Vitality Heart Rate Points Calculator &amp; Guide">
+<meta property="og:description" content="Your age in, your bpm targets out. Plus how AIA counts heart rate points, daily limits and the 15,000 yearly cap.">
+<meta property="og:image" content="https://aia-vitality-hr-calculator.dragooz.com/assets/og-image.png">
+<meta property="og:url" content="https://aia-vitality-hr-calculator.dragooz.com/">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
+<meta property="og:locale" content="en_MY">
+<meta property="og:site_name" content="AIA Vitality Heart Rate Calculator">
+<link rel="canonical" href="https://aia-vitality-hr-calculator.dragooz.com/">
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-619K2BZKS6"></script>
@@ -35,6 +39,130 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How are AIA Vitality heart rate points calculated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AIA Vitality awards 50, 100 or 150 points for a single workout, based on your average heart rate as a percentage of your age-related maximum and how long you hold it. Your maximum is 220 minus your age. You earn 50 points for 10 minutes at 80% or 30 minutes at 60%; 100 points for 20 minutes at 80%, 30 minutes at 70% or 60 minutes at 60%; and 150 points for 30 minutes at 80%, 60 minutes at 70% or 90 minutes at 60%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is my age-related maximum heart rate for AIA Vitality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AIA uses 220 minus your age. A 40-year-old has a maximum of 180 bpm, so 60% is 108 bpm, 70% is 126 bpm and 80% is 144 bpm. AIA credits points against this formula, not against a maximum measured in a lab."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many heart rate points can I earn in a day?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Heart rate points are awarded once per day. If your tracker captures more than one workout, AIA awards the activity worth the most points, not the total of all of them."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the maximum AIA Vitality points from heart rate per year?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Heart rate and physical activity points cap at 15,000 per membership year. Step points cap separately at 10,000 per membership year."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why did I only get 50 points instead of 100?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The most common reasons are that your average heart rate for the session fell below the threshold, or the session was shorter than the tier required. AIA uses the average across the whole workout, not your peak, so a hard interval inside an easier session may not lift the average enough."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does AIA Vitality use average or peak heart rate?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Average. AIA's table specifies average age-related maximum heart rate across a single session. A short sprint that pushes your peak into a higher zone does not qualify the session if the average stays below the threshold."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do two short walks count as one session for AIA Vitality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. AIA measures the time of a single session. Two 15-minute walks are two separate sessions of 15 minutes, not one 30-minute session, so neither reaches the 30-minute threshold."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What heart rate do I need for 150 AIA Vitality points?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "150 points needs 30 minutes at 80% of your maximum, 60 minutes at 70%, or 90 minutes at 60%. For a 35-year-old with a maximum of 185 bpm, that is 30 minutes at 148 bpm, 60 minutes at 130 bpm, or 90 minutes at 111 bpm."
+      }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AIA Vitality Heart Rate Calculator",
+  "applicationCategory": "HealthApplication",
+  "operatingSystem": "Any",
+  "description": "Unofficial calculator that converts your age into the heart rate targets and session lengths needed for 50, 100 or 150 AIA Vitality heart rate points.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "MYR"
+  },
+  "isAccessibleForFree": true,
+  "disambiguatingDescription": "Independent hobby project. Not affiliated with, endorsed by, or connected to AIA Bhd."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "How to earn 150 AIA Vitality heart rate points in one workout",
+  "description": "Work out the heart rate and duration you need for the top heart rate tier.",
+  "totalTime": "PT30M",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "position": 1,
+      "name": "Find your maximum heart rate",
+      "text": "Subtract your age from 220. A 30-year-old has a maximum of 190 bpm."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 2,
+      "name": "Pick a tier",
+      "text": "150 points needs 30 minutes at 80% of maximum, 60 minutes at 70%, or 90 minutes at 60%."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 3,
+      "name": "Work out the target bpm",
+      "text": "Multiply your maximum by the percentage. For a 30-year-old, 80% of 190 is 152 bpm."
+    },
+    {
+      "@type": "HowToStep",
+      "position": 4,
+      "name": "Hold the average for the full session",
+      "text": "AIA counts your average across one unbroken session, so keep the effort steady rather than relying on short peaks."
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -96,11 +224,55 @@
     </div>
   </section>
 
+
+  <section class="prose">
+    <h2>How AIA Vitality counts heart rate points</h2>
+
+    <p>AIA Vitality pays out on a <b>single workout</b>, once per day. Two numbers decide the tier: your <b>average</b> heart rate for that session as a share of your age-related maximum, and <b>how long</b> you sustain it. Nothing else feeds into it &mdash; not distance, not calories, not the sport.</p>
+
+    <p>Your age-related maximum is <b>220 minus your age</b>. At 40 that is 180 bpm, so 60% is 108 bpm, 70% is 126 bpm, and 80% is 144 bpm. This is a population average rather than your personal ceiling, but it is the number AIA credits against, so it is the one worth training to.</p>
+
+    <h3>The three things that catch people out</h3>
+
+    <p><b>It is the average, not the peak.</b> A five-minute push to 160 bpm inside a 40-minute walk will not carry the session average past 70%. The tier is decided by the whole workout.</p>
+
+    <p><b>One session, unbroken.</b> A 15-minute walk in the morning and another after dinner are two 15-minute sessions. Neither reaches the 30-minute threshold, so neither pays.</p>
+
+    <p><b>Only your best workout counts each day.</b> If your tracker captures three activities, AIA awards the one worth the most points, not the sum. A 150-point run and a 50-point walk on the same day is 150 points, not 200.</p>
+
+    <h3>Worked example</h3>
+
+    <p>A 35-year-old has a maximum of <b>185 bpm</b> (220 &minus; 35). To reach the top tier they need one of: 30 minutes averaging <b>148 bpm</b>, 60 minutes averaging <b>130 bpm</b>, or 90 minutes averaging <b>111 bpm</b>. The 90-minute option is a brisk walk; the 30-minute option is a hard run. Both pay 150 points.</p>
+
+    <h3>Yearly limits</h3>
+
+    <p>Heart rate and physical activity points cap at <b>15,000 per membership year</b>. Steps cap separately at <b>10,000</b>. Hitting 150 points every day would reach the activity cap in about 100 days, so the cap binds well before the year is out for anyone training consistently.</p>
+  </section>
+
+  <section class="prose">
+    <h2>Common questions</h2>
+
+    <h3>Why did I only get 50 points instead of 100?</h3>
+    <p>Usually the session average landed under the threshold, or it ran short. Check the average your watch reported rather than the peak, then compare it against the table above. Being two minutes short of 30 minutes drops a 100-point session to 50.</p>
+
+    <h3>What if my watch shows a different maximum heart rate?</h3>
+    <p>Garmin, Apple and Fitbit often estimate a personal maximum from your training history, and it can sit 10 to 20 bpm either side of 220 minus age. AIA scores against the formula regardless, so use the targets on this page for points and your watch's zones for training.</p>
+
+    <h3>Does walking earn heart rate points?</h3>
+    <p>Yes, if the average is high enough for long enough. For most people a brisk walk sits near 60% of maximum, which pays 50 points at 30 minutes, 100 at 60 minutes and 150 at 90 minutes.</p>
+
+    <h3>Do heart rate points and step points stack?</h3>
+    <p>Yes. They are separate categories with separate caps, so a day can earn both. Only heart rate points are limited to your single best workout.</p>
+
+    <h3>How long until points show on my statement?</h3>
+    <p>That depends on your tracker syncing to AIA Vitality, not on this page. If a workout is missing, check the device connection in the AIA Vitality app first.</p>
+  </section>
+
   <footer>
     <p><strong>This is a hobby project, not from AIA.</strong> No connection to AIA Bhd, no endorsement, no money made from it.</p>
 
     <ul>
-      <li>AIA counts your <b>average</b> heart rate over <b>one unbroken session</b>, once per day. Only the highest tier counts.</li>
+      <li>AIA counts your <b>average</b> heart rate over <b>one unbroken session</b>, once per day. If your tracker captures several workouts, the one worth the most points is awarded.</li>
       <li>Heart rate points cap at <b>15,000 per membership year</b>, separately from 10,000 step points.</li>
       <li><b>220 &minus; age</b> is a population average. A lab-measured maximum can sit 10&ndash;20 bpm either side, but AIA credits against this formula regardless.</li>
       <li>Your watch decides what it reports. If its numbers differ from this page, your watch is what earns the points.</li>

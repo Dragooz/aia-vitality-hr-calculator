@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aia-vitality-hr-calculator.dragooz.com/sitemap.xml

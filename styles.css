@@ -314,6 +314,41 @@ tr.hit td.dur::after {
 .verdict-text { margin: 0; color: var(--muted); font-size: 14px; max-width: 42ch; }
 .verdict-text b { color: var(--ink); font-weight: 600; }
 
+/* ---- prose sections ---- */
+
+.prose {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 62ch;
+}
+
+.prose h2 {
+  margin: 0 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.prose h3 {
+  margin: 10px 0 -4px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.005em;
+}
+
+.prose p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--muted);
+}
+
+.prose b { color: var(--ink); font-weight: 600; }
+
 /* ---- footer ---- */
 
 footer {
