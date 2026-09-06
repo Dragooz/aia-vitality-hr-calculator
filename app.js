@@ -10,6 +10,13 @@ const MIN_AGE = 13;
 const MAX_AGE = 100;
 const IMPLAUSIBLE_BPM = 230;
 
+// Step thresholds from AIA's points table, high to low.
+const STEP_TIERS = [
+  { points: 100, min: 12500 },
+  { points:  50, min:  7500 },
+  { points:  25, min:  5000 },
+];
+
 const ageEl = document.getElementById("age");
 const bpmEl = document.getElementById("bpm");
 const minsEl = document.getElementById("mins");
@@ -18,6 +25,10 @@ const pointsEl = document.getElementById("points");
 const sayEl = document.getElementById("say");
 const ladderEl = document.getElementById("ladder");
 const resultEl = document.getElementById("result");
+const stepsEl = document.getElementById("steps");
+const stepsPtsEl = document.getElementById("steps-pts");
+const stepsNoteEl = document.getElementById("steps-note");
+const totalEl = document.getElementById("total");
 
 const bpmFor = (age, pct) => Math.round((220 - age) * pct);
 
@@ -78,6 +89,39 @@ function renderLadder(age, bpm, mins, points) {
   ladderEl.innerHTML = rows.join("");
 }
 
+const nf = new Intl.NumberFormat("en-MY");
+
+function stepPoints(steps) {
+  for (const t of STEP_TIERS) if (steps >= t.min) return t.points;
+  return 0;
+}
+
+function renderSteps(steps, hrPoints) {
+  if (steps === null) {
+    stepsPtsEl.textContent = "—";
+    stepsPtsEl.classList.add("zero");
+    stepsNoteEl.textContent = "Enter your step count.";
+    totalEl.innerHTML = "";
+    return 0;
+  }
+
+  const pts = stepPoints(steps);
+  stepsPtsEl.textContent = pts;
+  stepsPtsEl.classList.toggle("zero", pts === 0);
+
+  const next = [...STEP_TIERS].reverse().find(t => steps < t.min);
+  stepsNoteEl.innerHTML = next
+    ? `points &nbsp;·&nbsp; <b>${nf.format(next.min - steps)}</b> more for ${next.points}`
+    : "points &nbsp;·&nbsp; top step tier";
+
+  // Heart rate and step points do NOT stack: the day pays the higher of the
+  // two, capped at 150.
+  const best = Math.max(hrPoints, pts);
+  const from = pts > hrPoints ? "from steps" : pts === hrPoints && pts > 0 ? "either way" : "from your workout";
+  totalEl.innerHTML = `<span>Today</span><b>${best}</b><span>points ${best > 0 ? from : ""}</span>`;
+  return pts;
+}
+
 let lastPoints = null;
 
 function update() {
@@ -103,6 +147,7 @@ function update() {
       : "Enter how long the workout lasted.";
     resultEl.style.setProperty("--fill", 0);
     renderLadder(age, bpm ?? 0, mins ?? 0, 0);
+    renderSteps(readInt(stepsEl, 0, 100000), 0);
     return;
   }
 
@@ -130,7 +175,8 @@ function update() {
   }
 
   renderLadder(age, bpm, mins, points);
+  renderSteps(readInt(stepsEl, 0, 100000), points);
 }
 
-[ageEl, bpmEl, minsEl].forEach(el => el.addEventListener("input", update));
+[ageEl, bpmEl, minsEl, stepsEl].forEach(el => el.addEventListener("input", update));
 update();

@@ -324,6 +324,74 @@ input[type="number"]:focus-visible {
 .rung.next .rung-tick { color: var(--accent-ink); }
 .rung .rung-tick { color: transparent; }
 
+/* ---- steps: secondary to heart rate ---- */
+
+.steps-card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.steps-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.steps-row .field { flex-shrink: 0; }
+.steps-row input[type="number"] { width: 130px; font-size: 21px; }
+
+.steps-out {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  padding-bottom: 9px;
+  flex-wrap: wrap;
+}
+
+.steps-pts {
+  font-size: 27px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--accent-ink);
+}
+
+.steps-pts.zero { color: var(--muted); opacity: .5; }
+
+.steps-note { font-size: 13px; color: var(--muted); }
+.steps-note b { color: var(--ink); font-weight: 600; }
+
+.total {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--hairline);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.total span:last-child { text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+.total b {
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  text-transform: none;
+}
+
 /* ---- collapsible detail ---- */
 
 details {
@@ -400,7 +468,14 @@ footer {
 }
 
 footer p { margin: 0 0 5px; }
-footer a { color: var(--accent-ink); }
+footer a {
+  color: var(--accent-ink);
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 2px;
+  transition: text-decoration-color .16s ease;
+}
+
+footer a:hover { text-decoration-color: var(--accent-ink); }
 
 @media (max-width: 520px) {
   .ask { grid-template-columns: 1fr 1fr; }
@@ -410,6 +485,9 @@ footer a { color: var(--accent-ink); }
   .rung { gap: 10px; padding: 12px 13px; }
   .rung-pts { font-size: 22px; min-width: 46px; }
   .rung-how { font-size: 13.5px; }
+  .steps-row { flex-direction: column; align-items: stretch; gap: 11px; }
+  .steps-row input[type="number"] { width: 100%; }
+  .steps-out { padding-bottom: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
