@@ -1,177 +1,136 @@
-// Thresholds transcribed from AIA's published table. minPct is the fraction of
-// age-related max heart rate; minMins is session length. Ordered high to low so
-// the first match in checkSession() is the best tier.
+// Thresholds from AIA's published table. Ordered high to low so the first
+// match is the best tier.
 const TIERS = [
-  { points: 150, rules: [{ minPct: 0.80, minMins: 30 }, { minPct: 0.70, minMins: 60 }, { minPct: 0.60, minMins: 90 }] },
-  { points: 100, rules: [{ minPct: 0.80, minMins: 20 }, { minPct: 0.70, minMins: 30 }, { minPct: 0.60, minMins: 60 }] },
-  { points:  50, rules: [{ minPct: 0.80, minMins: 10 }, { minPct: 0.60, minMins: 30 }] },
+  { points: 150, rules: [{ pct: 0.80, mins: 30 }, { pct: 0.70, mins: 60 }, { pct: 0.60, mins: 90 }] },
+  { points: 100, rules: [{ pct: 0.80, mins: 20 }, { pct: 0.70, mins: 30 }, { pct: 0.60, mins: 60 }] },
+  { points:  50, rules: [{ pct: 0.80, mins: 10 }, { pct: 0.60, mins: 30 }] },
 ];
 
-// AIA Vitality membership starts at 16. Allow a little below rather than
-// rejecting someone checking a family member, but not a child's.
 const MIN_AGE = 13;
 const MAX_AGE = 100;
-
-// Above this the reading is a sensor fault, not an effort. The highest
-// reliably recorded human heart rates sit around 220-230 bpm.
 const IMPLAUSIBLE_BPM = 230;
 
-// AIA credits one unbroken session. Longer is usually a day's total.
-const LONG_SESSION_MINS = 240;
+const ageEl = document.getElementById("age");
+const bpmEl = document.getElementById("bpm");
+const minsEl = document.getElementById("mins");
+const hintEl = document.getElementById("hint");
+const pointsEl = document.getElementById("points");
+const sayEl = document.getElementById("say");
+const ladderEl = document.getElementById("ladder");
+const resultEl = document.getElementById("result");
 
-const ageInput = document.getElementById("age");
-const bpmInput = document.getElementById("bpm");
-const minsInput = document.getElementById("mins");
-const maxhrEl = document.getElementById("maxhr");
-const noteEl = document.getElementById("note");
-const zonesEl = document.getElementById("zones");
-const tiersEl = document.getElementById("tiers");
-const verdictPtsEl = document.getElementById("verdict-pts");
-const verdictTextEl = document.getElementById("verdict-text");
-const zonesWrap = document.getElementById("zones-wrap");
-const tableSection = document.getElementById("table-section");
-const verdictEl = document.getElementById("verdict");
-
-// Round to the nearest whole beat: a target with a decimal is unusable on a
-// watch. This can differ by 1 bpm from AIA's unrounded figure.
 const bpmFor = (age, pct) => Math.round((220 - age) * pct);
 
-// Why an age was rejected, so the message names which end it failed.
-function ageProblem(raw) {
-  if (raw.trim() === "") return "Enter your age to see your targets.";
-  const age = Number(raw);
-  if (!Number.isFinite(age) || !Number.isInteger(age)) return "Enter your age as a whole number.";
-  if (age < MIN_AGE) return `Enter an age of ${MIN_AGE} or above.`;
-  if (age > MAX_AGE) return `Enter an age of ${MAX_AGE} or below.`;
-  return null;
+function readInt(el, lo, hi) {
+  const n = parseInt(el.value, 10);
+  return Number.isFinite(n) && n >= lo && n <= hi ? n : null;
 }
 
-function renderZones(age) {
-  zonesEl.innerHTML = [0.60, 0.70, 0.80].map(pct => `
-    <div class="zone">
-      <span class="zone-pct">${Math.round(pct * 100)}%</span>
-      <span class="zone-bpm">${bpmFor(age, pct)}</span>
-    </div>`).join("");
-}
-
-function renderTiers(age, didBpm, didMins) {
-  const rows = [];
-  for (const tier of TIERS) {
-    tier.rules.forEach((rule, i) => {
-      const targetBpm = bpmFor(age, rule.minPct);
-      const hit = didBpm !== null && didMins !== null && didBpm >= targetBpm && didMins >= rule.minMins;
-      rows.push(`
-        <tr class="${i === 0 ? "tier-start" : ""}${hit ? " hit" : ""}">
-          <td class="bpm"><b>${targetBpm} bpm</b> &middot; ${Math.round(rule.minPct * 100)}%</td>
-          <td class="dur">${rule.minMins} min</td>
-          ${i === 0 ? `<td class="pts" rowspan="${tier.rules.length}">${tier.points}</td>` : ""}
-        </tr>`);
-    });
+// Which rule inside a tier is closest for this session, and what it needs.
+function nearestRule(tier, age, bpm, mins) {
+  let best = null;
+  for (const r of tier.rules) {
+    const target = bpmFor(age, r.pct);
+    const needBpm = Math.max(0, target - bpm);
+    const needMins = Math.max(0, r.mins - mins);
+    // Beats are harder to add than minutes, so weight them heavier.
+    const cost = needMins + needBpm * 3;
+    if (best === null || cost < best.cost) best = { ...r, target, needBpm, needMins, cost };
   }
-  tiersEl.innerHTML = rows.join("");
+  return best;
 }
 
-function checkSession(age, didBpm, didMins) {
+function earned(age, bpm, mins) {
   for (const tier of TIERS) {
-    for (const rule of tier.rules) {
-      if (didBpm >= bpmFor(age, rule.minPct) && didMins >= rule.minMins) {
-        return { points: tier.points, rule };
-      }
+    for (const r of tier.rules) {
+      if (bpm >= bpmFor(age, r.pct) && mins >= r.mins) return { points: tier.points, rule: r };
     }
   }
   return { points: 0, rule: null };
 }
 
-// The nearest tier the session missed, and what would close the gap.
-function shortfallAdvice(age, didBpm, didMins, earnedPoints) {
-  let best = null;
-  for (const tier of TIERS) {
-    if (tier.points <= earnedPoints) continue;
-    for (const rule of tier.rules) {
-      const targetBpm = bpmFor(age, rule.minPct);
-      const extraMins = Math.max(0, rule.minMins - didMins);
-      const extraBpm = Math.max(0, targetBpm - didBpm);
-      // Minutes are the easier gap to close, so weight beats heavier rather
-      // than comparing the raw numbers.
-      const cost = extraMins + extraBpm * 3;
-      if (best === null || cost < best.cost) {
-        best = { cost, extraMins, extraBpm, targetBpm, rule, points: tier.points };
-      }
+function renderLadder(age, bpm, mins, points) {
+  // Low to high reads as a climb.
+  const rows = [...TIERS].reverse().map(tier => {
+    const done = points >= tier.points;
+    const near = nearestRule(tier, age, bpm, mins);
+    const isNext = !done && tier.points > points &&
+                   !TIERS.some(t => t.points > points && t.points < tier.points);
+
+    let how, tick;
+    if (done) {
+      how = `<b>${near.mins} min</b> at <b>${near.target} bpm</b>`;
+      tick = "Earned";
+    } else {
+      const gaps = [];
+      if (near.needBpm > 0) gaps.push(`<b>${near.needBpm} bpm</b> harder`);
+      if (near.needMins > 0) gaps.push(`<b>${near.needMins} min</b> longer`);
+      how = gaps.join(" and ");
+      tick = isNext ? "Next up" : "";
     }
-  }
-  if (best === null) return "";
-  const needs = [];
-  if (best.extraBpm > 0) needs.push(`<b>${best.extraBpm} bpm</b> harder`);
-  if (best.extraMins > 0) needs.push(`<b>${best.extraMins} min</b> longer`);
-  return ` For ${best.points}: ${needs.join(" and ")}.`;
+
+    return `<div class="rung ${done ? "done" : ""} ${isNext ? "next" : ""}">
+      <div class="rung-pts">${tier.points}</div>
+      <div class="rung-how">${how}</div>
+      <div class="rung-tick">${tick}</div>
+    </div>`;
+  });
+  ladderEl.innerHTML = rows.join("");
 }
+
+let lastPoints = null;
 
 function update() {
-  const problem = ageProblem(ageInput.value);
+  const age = readInt(ageEl, MIN_AGE, MAX_AGE);
+  const bpm = readInt(bpmEl, 40, IMPLAUSIBLE_BPM);
+  const mins = readInt(minsEl, 1, 600);
 
-  if (problem !== null) {
-    maxhrEl.textContent = "—";
-    noteEl.textContent = problem;
-    noteEl.classList.add("warn");
-    zonesWrap.hidden = true;
-    tableSection.hidden = true;
-    verdictEl.hidden = true;
+  if (age === null) {
+    hintEl.textContent = `Enter an age between ${MIN_AGE} and ${MAX_AGE}.`;
+    hintEl.classList.add("warn");
     return;
   }
 
-  const age = Number(ageInput.value);
   const maxHr = 220 - age;
+  hintEl.classList.remove("warn");
+  hintEl.innerHTML = `Your max is <b>${maxHr} bpm</b> &nbsp;·&nbsp; 60% is <b>${bpmFor(age, .6)}</b> &nbsp;·&nbsp; 70% is <b>${bpmFor(age, .7)}</b> &nbsp;·&nbsp; 80% is <b>${bpmFor(age, .8)}</b>`;
 
-  noteEl.classList.remove("warn");
-  noteEl.innerHTML = `220 &minus; ${age} = ${maxHr} bpm`;
-  zonesWrap.hidden = false;
-  tableSection.hidden = false;
-  verdictEl.hidden = false;
-
-  maxhrEl.textContent = maxHr;
-  renderZones(age);
-
-  const didBpm = parseInt(bpmInput.value, 10);
-  const didMins = parseInt(minsInput.value, 10);
-  const entered = Number.isFinite(didBpm) && didBpm > 0 && Number.isFinite(didMins) && didMins > 0;
-
-  renderTiers(age, entered ? didBpm : null, entered ? didMins : null);
-
-  if (!entered) {
-    verdictPtsEl.textContent = "—";
-    verdictPtsEl.classList.add("zero");
-    verdictTextEl.textContent = "Enter a heart rate and a length to check a session.";
+  if (bpm === null || mins === null) {
+    pointsEl.textContent = "—";
+    pointsEl.classList.add("zero");
+    sayEl.textContent = bpm === null
+      ? "Enter the average heart rate your watch recorded."
+      : "Enter how long the workout lasted.";
+    resultEl.style.setProperty("--fill", 0);
+    renderLadder(age, bpm ?? 0, mins ?? 0, 0);
     return;
   }
 
-  // A reading far above the age-related maximum is almost always the watch
-  // misreading, not a real effort. Say so rather than awarding points on it.
-  if (didBpm > IMPLAUSIBLE_BPM) {
-    verdictPtsEl.textContent = "—";
-    verdictPtsEl.classList.add("zero");
-    verdictTextEl.innerHTML = `<b>${didBpm} bpm</b> is above what a human heart sustains. Check the reading &mdash; wrist sensors often double-count during weights or cycling.`;
-    return;
+  const { points, rule } = earned(age, bpm, mins);
+  const pctOfMax = Math.round((bpm / maxHr) * 100);
+
+  if (points !== lastPoints) {
+    pointsEl.classList.remove("bump");
+    void pointsEl.offsetWidth; // restart the animation
+    pointsEl.classList.add("bump");
+    lastPoints = points;
   }
 
-  const { points, rule } = checkSession(age, didBpm, didMins);
-  verdictPtsEl.textContent = points;
-  verdictPtsEl.classList.toggle("zero", points === 0);
+  pointsEl.textContent = points;
+  pointsEl.classList.toggle("zero", points === 0);
+  resultEl.style.setProperty("--fill", points / 150);
 
-  const pctOfMax = Math.round((didBpm / maxHr) * 100);
-  const parts = [`<b>${didMins} min</b> at <b>${didBpm} bpm</b> is ${pctOfMax}% of your max.`];
+  const effort = `<b>${mins} min</b> at <b>${bpm} bpm</b> is <b>${pctOfMax}%</b> of your max.`;
+  if (points === 0) {
+    sayEl.innerHTML = `${effort} Just short of the first tier.`;
+  } else if (points === 150) {
+    sayEl.innerHTML = `${effort} That is the top tier for one workout.`;
+  } else {
+    sayEl.innerHTML = `${effort} Clears ${rule.mins} min at ${Math.round(rule.pct * 100)}%.`;
+  }
 
-  // Over 100% is possible (the formula is an average, not a ceiling) but more
-  // often a bad reading, so flag it either way.
-  if (didBpm > maxHr) parts.push(`That is above your ${maxHr} bpm age-related max.`);
-  if (points > 0) parts.push(`Clears ${rule.minMins} min at ${Math.round(rule.minPct * 100)}%.`);
-  else parts.push("Under every threshold.");
-
-  const advice = shortfallAdvice(age, didBpm, didMins, points);
-  if (advice) parts.push(advice.trim());
-  if (didMins > LONG_SESSION_MINS) parts.push("That is unusually long for one unbroken session.");
-
-  verdictTextEl.innerHTML = parts.join(" ");
+  renderLadder(age, bpm, mins, points);
 }
 
-[ageInput, bpmInput, minsInput].forEach(el => el.addEventListener("input", update));
+[ageEl, bpmEl, minsEl].forEach(el => el.addEventListener("input", update));
 update();
