@@ -1,7 +1,8 @@
 name = "aia-vitality-hr-calculator"
 compatibility_date = "2026-09-06"
 
-# Static site: no Worker script. Cloudflare serves the files in this
-# directory directly, index.html at the root.
+# Static site, no Worker script. Everything under ./public is served,
+# index.html at the root. Keeping assets in their own directory stops
+# Wrangler walking .git and the config files.
 [assets]
-directory = "."
+directory = "./public"
