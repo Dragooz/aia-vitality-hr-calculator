@@ -557,69 +557,39 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
 #panel-steps .field { max-width: 220px; }
 
-/* ---- collapsible detail ---- */
+/* ---- guide ---- */
 
-details {
+.lede {
+  margin: -10px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.guide {
   background: var(--surface);
   border: 1px solid var(--hairline);
   border-radius: 12px;
   overflow: hidden;
 }
 
-summary {
-  padding: 14px 18px;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: var(--ink);
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  transition: background-color .16s ease;
-}
-
-summary::-webkit-details-marker { display: none; }
-summary:hover { background: var(--accent-soft); }
-
-summary::before {
-  content: "";
-  width: 7px; height: 7px;
-  border-right: 2px solid var(--accent);
-  border-bottom: 2px solid var(--accent);
-  transform: rotate(-45deg);
-  transition: transform .22s ease;
-  flex-shrink: 0;
-  margin-left: 2px;
-}
-
-details[open] summary::before { transform: rotate(45deg); }
-
-summary:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: -2px;
-}
-
 .detail-body {
-  padding: 2px 18px 18px;
+  padding: 18px;
   font-size: 14px;
   line-height: 1.62;
   color: var(--muted);
   display: flex;
   flex-direction: column;
   gap: 11px;
-  animation: unfold .26s ease;
-}
-
-@keyframes unfold {
-  from { opacity: 0; transform: translateY(-5px); }
-  to   { opacity: 1; transform: none; }
 }
 
 .detail-body p { margin: 0; }
 .detail-body b { color: var(--ink); font-weight: 600; }
-.detail-body h3 { margin: 6px 0 -4px; font-size: 15px; color: var(--ink); }
+.detail-body h2 { margin: 14px 0 -2px; font-size: 17px; line-height: 1.3; color: var(--ink); }
+.detail-body h2:first-child { margin-top: 0; }
+.detail-body h3 { margin: 6px 0 -6px; font-size: 15px; color: var(--ink); }
 .detail-body a { color: var(--accent-ink); }
+.detail-body ol,
 .detail-body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 .detail-body .src { font-size: 12.5px; }
 
@@ -635,6 +605,7 @@ summary:focus-visible {
 .tiers th { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
 .tiers td:first-child { font-weight: 700; color: var(--accent-ink); }
 .tiers td { color: var(--ink); }
+.tiers caption { caption-side: bottom; padding-top: 6px; font-size: 12.5px; color: var(--muted); }
 
 /* ---- footer ---- */
 
