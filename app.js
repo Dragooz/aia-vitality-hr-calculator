@@ -228,7 +228,7 @@ function renderTrack(age, bpm, mins, points) {
 
   nextEl.innerHTML = next;
   trackEl.innerHTML = `
-    <div class="row-label">Intensity</div>
+    <div class="row-label">Average heart rate</div>
     <div class="lanes">${lanes}</div>
     <div class="axis-wrap"><div class="axis">${axis}</div><div class="axis-title">Minutes &rarr;</div></div>`;
 }
