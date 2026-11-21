@@ -89,7 +89,7 @@
                         "name": "What is my age-related maximum heart rate for AIA Vitality?",
                         "acceptedAnswer": {
                             "@type": "Answer",
-                            "text": "AIA uses 220 minus your age. A 40-year-old has a maximum of 180 bpm, so 60% is 108 bpm, 70% is 126 bpm and 80% is 144 bpm."
+                            "text": "AIA uses 220 minus your age. A 40-year-old has a maximum of 180 bpm, so 60% is 108 bpm, 70% is 126 bpm and 80% is 144 bpm. Targets always round up: at 27, 70% of 193 is 135.1, so you need 136 bpm, not 135."
                         }
                     },
                     {
@@ -230,7 +230,7 @@
                 <p class="result-say" id="say"></p>
             </section>
 
-            <section class="ladder" id="ladder"></section>
+            <section class="track-card" id="track" aria-label="Workout timeline"></section>
 
             <section class="steps-card">
                 <div class="steps-row">
@@ -249,9 +249,10 @@
                     </div>
                     <div class="steps-out">
                         <div class="steps-pts" id="steps-pts">50</div>
-                        <div class="steps-note" id="steps-note"></div>
+                        <div class="steps-note">points</div>
                     </div>
                 </div>
+                <div class="steps-track" id="steps-track" aria-label="Steps timeline"></div>
                 <div class="total" id="total"></div>
             </section>
 
@@ -270,6 +271,13 @@
                         Your maximum is <b>220 minus your age</b>. At 40 that is
                         180&nbsp;bpm, so 60% is 108&nbsp;bpm, 70% is
                         126&nbsp;bpm and 80% is 144&nbsp;bpm.
+                    </p>
+
+                    <p>
+                        <b>Targets always round up.</b> At 27 your max is
+                        193&nbsp;bpm, so 70% is 135.1. AIA does not count
+                        135&nbsp;bpm; you need <b>136</b>. The targets here are
+                        already rounded up for you.
                     </p>
 
                     <h3>Three things that catch people out</h3>

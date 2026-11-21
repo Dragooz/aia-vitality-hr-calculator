@@ -1,9 +1,9 @@
 // Thresholds from AIA's published table. Ordered high to low so the first
-// match is the best tier.
+// match is the best tier. pct is a whole-number percent of max heart rate.
 const TIERS = [
-  { points: 150, rules: [{ pct: 0.80, mins: 30 }, { pct: 0.70, mins: 60 }, { pct: 0.60, mins: 90 }] },
-  { points: 100, rules: [{ pct: 0.80, mins: 20 }, { pct: 0.70, mins: 30 }, { pct: 0.60, mins: 60 }] },
-  { points:  50, rules: [{ pct: 0.80, mins: 10 }, { pct: 0.60, mins: 30 }] },
+  { points: 150, rules: [{ pct: 80, mins: 30 }, { pct: 70, mins: 60 }, { pct: 60, mins: 90 }] },
+  { points: 100, rules: [{ pct: 80, mins: 20 }, { pct: 70, mins: 30 }, { pct: 60, mins: 60 }] },
+  { points:  50, rules: [{ pct: 80, mins: 10 }, { pct: 60, mins: 30 }] },
 ];
 
 // One definition per field: bounds, and what to say when they are broken.
@@ -53,14 +53,43 @@ const minsEl = document.getElementById("mins");
 const hintEl = document.getElementById("hint");
 const pointsEl = document.getElementById("points");
 const sayEl = document.getElementById("say");
-const ladderEl = document.getElementById("ladder");
+const trackEl = document.getElementById("track");
 const resultEl = document.getElementById("result");
 const stepsEl = document.getElementById("steps");
 const stepsPtsEl = document.getElementById("steps-pts");
-const stepsNoteEl = document.getElementById("steps-note");
+const stepsTrackEl = document.getElementById("steps-track");
 const totalEl = document.getElementById("total");
 
-const bpmFor = (age, pct) => Math.round((220 - age) * pct);
+const nf = new Intl.NumberFormat("en-MY");
+
+// AIA always rounds the target UP: at 27, 70% is 135.1, so 135 fails and
+// 136 passes. Integer maths first so float noise never tips a whole number up.
+const bpmFor = (age, pct) => Math.ceil(((220 - age) * pct) / 100);
+
+/* ---------- remember last inputs ---------- */
+
+const STORE_KEY = "aia-hr-calc:v1";
+const FIELDS = [ageEl, bpmEl, minsEl, stepsEl];
+
+function restore() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (!saved) return;
+    for (const el of FIELDS) {
+      if (typeof saved[el.id] === "string") el.value = saved[el.id];
+    }
+  } catch (_) { /* storage blocked or corrupt: keep defaults */ }
+}
+
+function save() {
+  try {
+    const data = {};
+    for (const el of FIELDS) data[el.id] = el.value;
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  } catch (_) { /* private mode etc. */ }
+}
+
+/* ---------- validation ---------- */
 
 // Returns {value} when good, or {error} naming what is wrong. Never both.
 function validate(el, key) {
@@ -92,6 +121,8 @@ function applyState(el, result) {
   return result.value ?? null;
 }
 
+/* ---------- scoring ---------- */
+
 // Which rule inside a tier is closest for this session, and what it needs.
 function nearestRule(tier, age, bpm, mins) {
   let best = null;
@@ -115,103 +146,194 @@ function earned(age, bpm, mins) {
   return { points: 0, rule: null };
 }
 
-function renderLadder(age, bpm, mins, points) {
-  // Low to high reads as a climb.
-  const rows = [...TIERS].reverse().map(tier => {
-    const done = points >= tier.points;
-    const near = nearestRule(tier, age, bpm, mins);
-    const isNext = !done && tier.points > points &&
-                   !TIERS.some(t => t.points > points && t.points < tier.points);
-
-    let how, tick;
-    if (done) {
-      how = `<b>${near.mins} min</b> at <b>${near.target} bpm</b>`;
-      tick = "Earned";
-    } else {
-      const gaps = [];
-      if (near.needBpm > 0) gaps.push(`<b>${near.needBpm} bpm</b> harder`);
-      if (near.needMins > 0) gaps.push(`<b>${near.needMins} min</b> longer`);
-      how = gaps.join(" and ");
-      tick = isNext ? "Next up" : "";
-    }
-
-    return `<div class="rung ${done ? "done" : ""} ${isNext ? "next" : ""}">
-      <div class="rung-pts">${tier.points}</div>
-      <div class="rung-how">${how}</div>
-      <div class="rung-tick">${tick}</div>
-    </div>`;
-  });
-  ladderEl.innerHTML = rows.join("");
-}
-
-const nf = new Intl.NumberFormat("en-MY");
-
 function stepPoints(steps) {
   for (const t of STEP_TIERS) if (steps >= t.min) return t.points;
   return 0;
 }
 
-function renderSteps(steps, hrPoints) {
-  if (steps === null) {
-    stepsPtsEl.textContent = "—";
-    stepsPtsEl.classList.add("zero");
-    stepsNoteEl.textContent = "Enter your step count.";
-    totalEl.innerHTML = "";
-    return 0;
+/* ---------- workout timeline ---------- */
+
+// One lane per intensity, each with its own minute milestones.
+const LANES = [80, 70, 60].map(pct => ({
+  pct,
+  marks: TIERS.flatMap(t => t.rules.filter(r => r.pct === pct).map(r => ({ mins: r.mins, points: t.points })))
+              .sort((a, b) => a.mins - b.mins),
+}));
+
+// Piecewise minute scale: the crowded 0-30 range gets as much room as 30-90,
+// so the 10/20/30 milestones on the 80% lane do not collide on a phone.
+const X_STOPS = [[0, 0], [30, 45], [90, 90], [120, 100]];
+function xPos(mins) {
+  const m = Math.max(0, Math.min(mins, 120));
+  for (let i = 1; i < X_STOPS.length; i++) {
+    const [m0, x0] = X_STOPS[i - 1], [m1, x1] = X_STOPS[i];
+    if (m <= m1) return x0 + ((m - m0) / (m1 - m0)) * (x1 - x0);
+  }
+  return 100;
+}
+
+// Intensity gauge runs 50%-90% of max.
+function gaugePos(bpm, maxHr) {
+  const lo = maxHr * 0.5, hi = maxHr * 0.9;
+  return Math.max(0, Math.min(100, ((bpm - lo) / (hi - lo)) * 100));
+}
+
+function renderTrack(age, bpm, mins, points) {
+  const maxHr = 220 - age;
+  const hasBpm = bpm !== null, hasMins = mins !== null;
+
+  // The single next goal, so the chart can light it up.
+  const nextTier = [...TIERS].reverse().find(t => t.points > points);
+  const goal = nextTier && hasBpm && hasMins ? nearestRule(nextTier, age, bpm, mins) : null;
+
+  // Intensity gauge.
+  const ticks = [60, 70, 80].map(pct => {
+    const t = bpmFor(age, pct);
+    const hit = hasBpm && bpm >= t;
+    return `<div class="g-tick ${hit ? "hit" : ""}" style="left:${gaugePos(t, maxHr)}%">
+        <span class="g-pct">${pct}%</span><span class="g-bpm">${t}</span>
+      </div>`;
+  }).join("");
+  const pin = hasBpm
+    ? `<div class="g-pin" style="left:${gaugePos(bpm, maxHr)}%"><span>${bpm}</span></div>`
+    : "";
+  const gauge = `
+    <div class="gauge" aria-hidden="true">
+      <div class="g-bar"><div class="g-fill" style="width:${hasBpm ? gaugePos(bpm, maxHr) : 0}%"></div>${ticks}${pin}</div>
+    </div>`;
+
+  // Minute lanes.
+  const lanes = LANES.map(lane => {
+    const target = bpmFor(age, lane.pct);
+    const ok = hasBpm && bpm >= target;
+    const fill = hasMins ? xPos(mins) : 0;
+
+    const marks = lane.marks.map(mk => {
+      const got = ok && hasMins && mins >= mk.mins;
+      const isGoal = goal && goal.pct === lane.pct && goal.mins === mk.mins;
+      const won = got && mk.points === points;
+      return `<div class="mk ${got ? "got" : ""} ${isGoal ? "goal" : ""} ${won ? "won" : ""}"
+                   style="left:${xPos(mk.mins)}%" title="${mk.points} pts at ${mk.mins} min">${mk.points}</div>`;
+    }).join("");
+
+    const chip = ok
+      ? `<span class="chip ok">&#10003;</span>`
+      : hasBpm ? `<span class="chip">+${target - bpm}</span>` : "";
+
+    return `<div class="lane ${ok ? "ok" : "locked"}">
+        <div class="lane-label"><b>${lane.pct}%</b><span>${target}+</span>${chip}</div>
+        <div class="lane-bar">
+          <div class="lane-fill" style="width:${fill}%"></div>
+          ${hasMins ? `<div class="now" style="left:${fill}%"></div>` : ""}
+          ${marks}
+        </div>
+      </div>`;
+  }).join("");
+
+  const axis = [0, 10, 20, 30, 60, 90, 120].map(m =>
+    `<span style="left:${xPos(m)}%">${m === 120 ? "120+" : m}</span>`).join("");
+
+  let next;
+  if (!hasBpm || !hasMins) next = "";
+  else if (!goal) next = `<span class="next done">Max tier &#9733;</span>`;
+  else {
+    const bits = [];
+    if (goal.needMins > 0) bits.push(`+${goal.needMins} min`);
+    if (goal.needBpm > 0) bits.push(`+${goal.needBpm} bpm`);
+    next = `<span class="next">Next <b>${nextTier.points}</b> &rarr; ${bits.join(" · ")}</span>`;
   }
 
-  const pts = stepPoints(steps);
-  stepsPtsEl.textContent = pts;
+  trackEl.innerHTML = `
+    <div class="track-head"><span class="track-title">Workout</span>${next}</div>
+    <div class="row-label">bpm</div>
+    ${gauge}
+    <div class="row-label">minutes</div>
+    <div class="lanes">${lanes}</div>
+    <div class="axis-wrap"><div class="axis">${axis}</div></div>`;
+}
+
+/* ---------- steps timeline ---------- */
+
+const STEP_MAX = 15000;
+const stepX = s => Math.min(100, (s / STEP_MAX) * 100);
+
+function renderSteps(steps, hrPoints) {
+  const has = steps !== null;
+  const pts = has ? stepPoints(steps) : 0;
+
+  stepsPtsEl.textContent = has ? pts : "—";
   stepsPtsEl.classList.toggle("zero", pts === 0);
 
-  const next = [...STEP_TIERS].reverse().find(t => steps < t.min);
-  stepsNoteEl.innerHTML = next
-    ? `points &nbsp;·&nbsp; <b>${nf.format(next.min - steps)}</b> more for ${next.points}`
-    : "points &nbsp;·&nbsp; top step tier";
+  const next = has ? [...STEP_TIERS].reverse().find(t => steps < t.min) : null;
+  const marks = [...STEP_TIERS].reverse().map(t => {
+    const got = has && steps >= t.min;
+    const isGoal = next && next.min === t.min;
+    const won = got && t.points === pts;
+    return `<div class="mk ${got ? "got" : ""} ${isGoal ? "goal" : ""} ${won ? "won" : ""}"
+                 style="left:${stepX(t.min)}%" title="${t.points} pts at ${nf.format(t.min)} steps">${t.points}</div>`;
+  }).join("");
+  const axis = [0, 5000, 7500, 12500, 15000].map(s =>
+    `<span style="left:${stepX(s)}%">${s === 0 ? 0 : (s / 1000) + "k"}${s === STEP_MAX ? "+" : ""}</span>`).join("");
 
-  renderTotal(hrPoints, pts);
+  const label = !has ? ""
+    : next ? `<span class="next">Next <b>${next.points}</b> &rarr; +${nf.format(next.min - steps)}</span>`
+           : `<span class="next done">Max tier &#9733;</span>`;
+
+  stepsTrackEl.innerHTML = `
+    <div class="track-head"><span class="track-title">Steps</span>${label}</div>
+    <div class="lane ok solo">
+      <div class="lane-bar">
+        <div class="lane-fill" style="width:${has ? stepX(steps) : 0}%"></div>
+        ${has ? `<div class="now" style="left:${stepX(steps)}%"></div>` : ""}
+        ${marks}
+      </div>
+    </div>
+    <div class="axis-wrap solo"><div class="axis">${axis}</div></div>`;
+
+  renderTotal(hrPoints, has ? pts : 0, has);
   return pts;
 }
 
-function renderTotal(hrPoints, stepPts) {
+/* ---------- daily total ---------- */
+
+function renderTotal(hrPoints, stepPts, hasSteps) {
   // Heart rate and step points do NOT stack. AIA pays the higher of the two.
   const awarded = Math.max(hrPoints, stepPts);
   const naive = hrPoints + stepPts;
   const bothEarned = hrPoints > 0 && stepPts > 0;
+  const hrWins = hrPoints >= stepPts;
 
-  const source = hrPoints > stepPts ? "your workout"
-               : stepPts > hrPoints ? "your steps"
-               : "either one on its own";
-
-  // Only worth showing the crossed-out sum when both actually scored - that
-  // is the only case where someone would expect them to add up.
-  const tally = bothEarned
-    ? `<div class="tally">
-         <span class="tally-part">${hrPoints}<i>workout</i></span>
-         <span class="tally-op">+</span>
-         <span class="tally-part">${stepPts}<i>steps</i></span>
-         <span class="tally-op">=</span>
-         <span class="tally-wrong">${naive}</span>
-         <span class="tally-arrow">&rarr;</span>
-         <span class="tally-right">${awarded}</span>
-       </div>`
-    : "";
+  const bars = `
+    <div class="vs">
+      <div class="vs-row ${hrWins && awarded > 0 ? "win" : ""}">
+        <span class="vs-name">Workout</span>
+        <div class="vs-bar"><div style="width:${(hrPoints / 150) * 100}%"></div></div>
+        <span class="vs-num">${hrPoints}</span>
+      </div>
+      <div class="vs-row ${!hrWins && awarded > 0 ? "win" : ""}">
+        <span class="vs-name">Steps</span>
+        <div class="vs-bar"><div style="width:${(stepPts / 150) * 100}%"></div></div>
+        <span class="vs-num">${hasSteps ? stepPts : "—"}</span>
+      </div>
+    </div>`;
 
   const lesson = bothEarned
-    ? `<p class="total-lesson"><b>They do not add up.</b> AIA pays the higher of the two, so today is <b>${awarded}</b>, not ${naive}. You earned it from ${source}.</p>`
+    ? `<p class="total-lesson"><b>Higher one wins</b> &mdash; not <s>${naive}</s>.</p>`
     : awarded > 0
-      ? `<p class="total-lesson">Earned from ${source}. Heart rate and steps never add together &mdash; AIA pays whichever is higher.</p>`
-      : `<p class="total-lesson">Nothing yet today. You need 5,000 steps, or a workout that reaches the first heart rate tier.</p>`;
+      ? `<p class="total-lesson">Higher one wins. They never add up.</p>`
+      : `<p class="total-lesson">Nothing yet. 5,000 steps or the first workout tier gets you started.</p>`;
 
   totalEl.innerHTML = `
     <div class="total-head">
       <span class="total-label">Today you earn</span>
       <span class="total-value ${awarded === 0 ? "zero" : ""}">${awarded}</span>
-      <span class="total-unit">of 150 max</span>
+      <span class="total-unit">/ 150</span>
     </div>
-    ${tally}
+    ${bars}
     ${lesson}`;
 }
+
+/* ---------- main ---------- */
 
 let lastPoints = null;
 
@@ -228,14 +350,14 @@ function update() {
     pointsEl.classList.add("zero");
     sayEl.textContent = "";
     resultEl.style.setProperty("--fill", 0);
-    ladderEl.innerHTML = "";
+    trackEl.innerHTML = "";
     renderSteps(steps, 0);
     return;
   }
 
   const maxHr = 220 - age;
   hintEl.classList.remove("warn");
-  hintEl.innerHTML = `Your max is <b>${maxHr} bpm</b> &nbsp;·&nbsp; 60% is <b>${bpmFor(age, .6)}</b> &nbsp;·&nbsp; 70% is <b>${bpmFor(age, .7)}</b> &nbsp;·&nbsp; 80% is <b>${bpmFor(age, .8)}</b>`;
+  hintEl.innerHTML = `Max <b>${maxHr} bpm</b> (220 &minus; age). Targets round up: hit the number shown or higher.`;
 
   if (bpm === null || mins === null) {
     pointsEl.textContent = "—";
@@ -244,13 +366,14 @@ function update() {
       ? "Enter the average heart rate your watch recorded."
       : "Enter how long the workout lasted.";
     resultEl.style.setProperty("--fill", 0);
-    renderLadder(age, bpm ?? 0, mins ?? 0, 0);
+    renderTrack(age, bpm, mins, 0);
     renderSteps(steps, 0);
     return;
   }
 
-  const { points, rule } = earned(age, bpm, mins);
-  const pctOfMax = Math.round((bpm / maxHr) * 100);
+  const { points } = earned(age, bpm, mins);
+  // Floor so 69.9% never reads as 70%.
+  const pctOfMax = Math.floor((bpm / maxHr) * 100);
 
   if (points !== lastPoints) {
     pointsEl.classList.remove("bump");
@@ -262,19 +385,12 @@ function update() {
   pointsEl.textContent = points;
   pointsEl.classList.toggle("zero", points === 0);
   resultEl.style.setProperty("--fill", points / 150);
+  sayEl.innerHTML = `<b>${mins} min</b> · <b>${bpm} bpm</b> · <b>${pctOfMax}%</b> of max`;
 
-  const effort = `<b>${mins} min</b> at <b>${bpm} bpm</b> is <b>${pctOfMax}%</b> of your max.`;
-  if (points === 0) {
-    sayEl.innerHTML = `${effort} Just short of the first tier.`;
-  } else if (points === 150) {
-    sayEl.innerHTML = `${effort} That is the top tier for one workout.`;
-  } else {
-    sayEl.innerHTML = `${effort} Clears ${rule.mins} min at ${Math.round(rule.pct * 100)}%.`;
-  }
-
-  renderLadder(age, bpm, mins, points);
+  renderTrack(age, bpm, mins, points);
   renderSteps(steps, points);
 }
 
-[ageEl, bpmEl, minsEl, stepsEl].forEach(el => el.addEventListener("input", update));
+restore();
+FIELDS.forEach(el => el.addEventListener("input", () => { save(); update(); }));
 update();

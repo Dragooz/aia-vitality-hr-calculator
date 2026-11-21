@@ -270,59 +270,245 @@ input[type="number"]:focus-visible {
 
 .result-points.bump { animation: pop .42s cubic-bezier(.2,.9,.3,1.2); }
 
-/* ---- tier ladder ---- */
+/* ---- timelines (workout + steps) ---- */
 
-.ladder { display: flex; flex-direction: column; gap: 9px; }
-
-.rung {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 13px 16px;
+.track-card {
   background: var(--surface);
-  border: 1.5px solid var(--hairline);
-  border-radius: 12px;
-  transition: border-color .22s ease, background-color .22s ease, transform .22s ease;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 16px 18px 12px;
 }
 
-.rung.done {
-  border-color: var(--ok-line);
-  background: var(--ok-soft);
+.track-card:empty { display: none; }
+
+.track-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.rung.next {
-  border-color: var(--accent-line);
-  background: var(--accent-soft);
-  transform: translateX(3px);
-}
-
-.rung-pts {
-  font-size: 25px;
+.track-title {
+  font-size: 12px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -.02em;
-  min-width: 54px;
-  color: var(--muted);
-  transition: color .22s ease;
-}
-
-.rung.done .rung-pts { color: var(--ok); }
-.rung.next .rung-pts { color: var(--accent-ink); }
-
-.rung-how { flex: 1; font-size: 14px; line-height: 1.45; color: var(--muted); }
-.rung-how b { color: var(--ink); font-weight: 600; }
-
-.rung-tick {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .07em;
+  letter-spacing: .08em;
   text-transform: uppercase;
+  color: var(--muted);
+}
+
+.next {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-.rung.done .rung-tick { color: var(--ok); }
-.rung.next .rung-tick { color: var(--accent-ink); }
-.rung .rung-tick { color: transparent; }
+.next b { font-weight: 700; }
+.next.done { color: var(--ok); background: var(--ok-soft); border-color: var(--ok-line); }
+
+.row-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: .8;
+  margin: 6px 0 2px;
+}
+
+/* intensity gauge: label column matches lanes so the eye lines up */
+.gauge { padding: 34px 13px 24px var(--lab-w); }
+
+.g-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--ground);
+  border: 1px solid var(--hairline);
+}
+
+.g-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold), var(--accent));
+  transition: width .4s cubic-bezier(.2,.8,.3,1);
+}
+
+.g-tick {
+  position: absolute;
+  top: -5px;
+  height: 16px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--muted);
+  opacity: .55;
+}
+
+.g-tick.hit { background: var(--ok); opacity: 1; }
+
+.g-pct, .g-bpm {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.g-pct { top: -30px; color: var(--muted); font-size: 10px; }
+.g-bpm { top: -18px; color: var(--ink); }
+.g-tick.hit .g-pct, .g-tick.hit .g-bpm { color: var(--ok); }
+
+.g-pin {
+  position: absolute;
+  top: 50%;
+  width: 16px; height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 1.5px var(--accent);
+  transition: left .4s cubic-bezier(.2,.8,.3,1);
+  z-index: 2;
+}
+
+.g-pin span {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 6px;
+  padding: 0 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* minute lanes */
+.track-card, .steps-track { --lab-w: 92px; }
+
+.lanes { display: flex; flex-direction: column; gap: 6px; }
+
+.lane {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+}
+
+.lane-label {
+  flex: 0 0 var(--lab-w);
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.lane-label b { font-size: 15px; color: var(--ink); }
+.lane-label span { font-size: 11.5px; color: var(--muted); }
+
+.chip {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+  border-radius: 6px;
+  padding: 0 4px;
+}
+
+.chip.ok { color: var(--ok); background: var(--ok-soft); }
+
+.lane-bar {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  margin-right: 13px;
+  border-radius: 999px;
+  background: var(--ground);
+  border: 1px solid var(--hairline);
+}
+
+.lane-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--ok-line), var(--ok));
+  transition: width .4s cubic-bezier(.2,.8,.3,1);
+}
+
+/* Not intense enough: minutes still shown, but hatched and dimmed. */
+.lane.locked .lane-fill {
+  background: repeating-linear-gradient(-45deg, var(--hairline) 0 4px, transparent 4px 8px);
+}
+
+.lane.locked .lane-label b { color: var(--muted); }
+
+.now {
+  position: absolute;
+  top: -6px; bottom: -6px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: left .4s cubic-bezier(.2,.8,.3,1);
+}
+
+.mk {
+  position: absolute;
+  top: 50%;
+  width: 28px; height: 28px;
+  margin: -14px 0 0 -14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1.5px solid var(--hairline);
+  z-index: 1;
+  transition: background-color .22s ease, border-color .22s ease, color .22s ease, transform .22s ease;
+}
+
+.mk.got { color: var(--ok); border-color: var(--ok); background: var(--ok-soft); }
+.mk.won { color: #fff; background: var(--ok); border-color: var(--ok); transform: scale(1.12); }
+
+.mk.goal {
+  color: var(--accent-ink);
+  border: 2px dashed var(--accent);
+  background: var(--accent-soft);
+  animation: goal 1.8s ease-in-out infinite;
+}
+
+@keyframes goal {
+  0%, 100% { box-shadow: 0 0 0 0 var(--accent-line); }
+  50%      { box-shadow: 0 0 0 5px transparent; }
+}
+
+.axis-wrap { padding: 4px 13px 0 var(--lab-w); }
+.axis-wrap.solo { padding-left: 0; }
+
+.axis { position: relative; height: 16px; }
+
+.axis span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 10.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lane.solo .lane-bar { margin-right: 13px; }
 
 /* ---- validation ---- */
 
@@ -413,7 +599,10 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .steps-pts.zero { color: var(--muted); opacity: .5; }
 
 .steps-note { font-size: 13px; color: var(--muted); }
-.steps-note b { color: var(--ink); font-weight: 600; }
+
+.steps-track { padding: 2px 0 0; }
+.steps-track .lane { padding-left: 14px; }
+.steps-track .axis-wrap { padding-left: 14px; }
 
 .total {
   padding-top: 14px;
@@ -453,60 +642,49 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 .total-value.zero { color: var(--muted); opacity: .45; }
 .total-unit { font-size: 12.5px; color: var(--muted); }
 
-/* The arithmetic a beginner expects, shown next to what AIA actually pays. */
-.tally {
+/* Workout vs steps: higher bar wins, they never stack. */
+.vs { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 7px; }
+
+.vs-row {
   display: flex;
   align-items: center;
-  gap: 9px;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 11px 15px;
-  background: var(--ground);
-  border: 1px solid var(--hairline);
-  border-radius: 10px;
+  gap: 10px;
   font-variant-numeric: tabular-nums;
+  opacity: .55;
+  transition: opacity .22s ease;
 }
 
-.tally-part {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 19px;
+.vs-row.win { opacity: 1; }
+
+.vs-name {
+  flex: 0 0 64px;
+  text-align: left;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.1;
-  color: var(--ink);
-}
-
-.tally-part i {
-  font-style: normal;
-  font-size: 10px;
-  font-weight: 600;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-top: 2px;
 }
 
-.tally-op { font-size: 15px; font-weight: 600; color: var(--muted); }
-
-.tally-wrong {
-  font-size: 19px;
-  font-weight: 700;
-  color: var(--muted);
-  text-decoration: line-through;
-  text-decoration-color: var(--accent);
-  text-decoration-thickness: 2px;
-  opacity: .65;
+.vs-bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--ground);
+  border: 1px solid var(--hairline);
+  overflow: hidden;
 }
 
-.tally-arrow { font-size: 16px; color: var(--accent); font-weight: 700; }
-
-.tally-right {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--accent-ink);
-  letter-spacing: -.02em;
+.vs-bar div {
+  height: 100%;
+  background: var(--muted);
+  border-radius: inherit;
+  transition: width .4s cubic-bezier(.2,.8,.3,1);
 }
+
+.vs-row.win .vs-bar div { background: linear-gradient(90deg, var(--gold), var(--accent)); }
+
+.vs-num { flex: 0 0 30px; text-align: right; font-size: 16px; font-weight: 700; color: var(--ink); }
 
 .total-lesson {
   margin: 0;
@@ -517,6 +695,7 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 }
 
 .total-lesson b { color: var(--ink); font-weight: 600; }
+.total-lesson s { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
 
 /* ---- collapsible detail ---- */
 
@@ -608,15 +787,15 @@ footer a:hover { text-decoration-color: var(--accent-ink); }
   .ask .field:first-child { grid-column: 1 / -1; }
   .result-points { font-size: 60px; }
   input[type="number"] { font-size: 23px; }
-  .rung { gap: 10px; padding: 12px 13px; }
-  .rung-pts { font-size: 22px; min-width: 46px; }
-  .rung-how { font-size: 13.5px; }
+  .track-card { padding: 14px 14px 10px; }
+  .track-card, .steps-track { --lab-w: 70px; }
+  .lane-label { flex-wrap: wrap; column-gap: 4px; row-gap: 0; }
+  .lane-label span { font-size: 10.5px; }
+  .lane-label b { font-size: 14px; }
+  .mk { width: 25px; height: 25px; margin: -12.5px 0 0 -12.5px; font-size: 10px; }
   .steps-row { flex-direction: column; align-items: stretch; gap: 11px; }
   .steps-row input[type="number"] { width: 100%; }
   .steps-out { padding-bottom: 0; }
-  .tally { gap: 7px; padding: 10px 11px; }
-  .tally-part, .tally-wrong { font-size: 17px; }
-  .tally-right { font-size: 20px; }
   .total-value { font-size: 33px; }
 }
 
