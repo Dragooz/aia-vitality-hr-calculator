@@ -158,6 +158,24 @@ function stepPoints(steps) {
   return 0;
 }
 
+/* ---------- chart legend ---------- */
+
+function legend(hr) {
+  const item = (swatch, text) => `<span class="lg-item">${swatch}<span>${text}</span></span>`;
+  const items = [
+    item(`<span class="mk lg won">50</span>`, "Your points"),
+    item(`<span class="mk lg got">25</span>`, "Reached"),
+    item(`<span class="mk lg goal">50</span>`, "Next goal"),
+    item(`<span class="lg-now"></span>`, "You are here"),
+  ];
+  if (hr) {
+    items.push(item(`<span class="lg-hatch"></span>`, "Heart rate too low"));
+    items.push(item(`<span class="chip">+5</span>`, "bpm short"));
+    items.push(item(`<span class="chip ok">&#10003;</span>`, "bpm target met"));
+  }
+  return `<div class="legend" aria-hidden="true">${items.join("")}</div>`;
+}
+
 /* ---------- workout timeline ---------- */
 
 // One lane per intensity, each with its own minute milestones.
@@ -252,11 +270,12 @@ function renderTrack(age, bpm, mins, points) {
 
   nextEl.innerHTML = next;
   trackEl.innerHTML = `
-    <div class="row-label">bpm</div>
+    <div class="row-label">Avg heart rate (bpm)</div>
     ${gauge}
-    <div class="row-label">minutes</div>
+    <div class="row-label">Intensity (% of max) &middot; bpm target</div>
     <div class="lanes">${lanes}</div>
-    <div class="axis-wrap"><div class="axis">${axis}</div></div>`;
+    <div class="axis-wrap"><div class="axis">${axis}</div><div class="axis-title">Minutes &rarr;</div></div>
+    ${legend(true)}`;
 }
 
 /* ---------- steps timeline ---------- */
@@ -296,7 +315,8 @@ function renderSteps(steps, hrPoints) {
         ${marks}
       </div>
     </div>
-    <div class="axis-wrap solo"><div class="axis">${axis}</div></div>`;
+    <div class="axis-wrap solo"><div class="axis">${axis}</div><div class="axis-title">Steps &rarr;</div></div>
+    ${legend(false)}`;
 
   renderTotal(hrPoints, has ? pts : 0, has);
   return pts;

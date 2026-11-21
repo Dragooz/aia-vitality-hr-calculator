@@ -497,6 +497,50 @@ input[type="number"]:focus-visible {
 
 .lane.solo .lane-bar { margin-right: 13px; }
 
+.axis-title {
+  margin-top: 2px;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- legend ---- */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--hairline);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.lg-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+
+.mk.lg {
+  position: static;
+  width: 22px; height: 22px;
+  margin: 0;
+  font-size: 9.5px;
+  transform: none;
+  animation: none;
+}
+
+.lg-now { width: 2px; height: 14px; border-radius: 2px; background: var(--accent); }
+
+.lg-hatch {
+  width: 22px; height: 10px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: repeating-linear-gradient(-45deg, var(--hairline) 0 4px, transparent 4px 8px);
+}
+
 /* ---- validation ---- */
 
 .msg {
