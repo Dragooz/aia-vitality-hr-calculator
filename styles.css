@@ -639,101 +639,28 @@ input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
   min-width: 30px;
 }
 
+.tab-pts.win {
+  color: #fff;
+  background: var(--ok);
+  border-color: var(--ok);
+}
+
+.tab-pts.win::before { content: "\2605  "; }
+
+/* Pulls up under the tabs: the one rule that links the two tabs. */
+.rule-note {
+  margin: -14px 0 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.rule-note b { color: var(--ink); font-weight: 600; }
+
 .panel { display: flex; flex-direction: column; gap: 22px; }
 .panel[hidden] { display: none; }
 
 #panel-steps .field { max-width: 220px; }
-
-.total {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  text-align: center;
-}
-
-.total-head {
-  display: flex;
-  align-items: baseline;
-  gap: 9px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.total-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.total-value {
-  font-size: 38px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  letter-spacing: -.03em;
-  color: var(--ink);
-}
-
-.total-value.zero { color: var(--muted); opacity: .45; }
-.total-unit { font-size: 12.5px; color: var(--muted); }
-
-/* Workout vs steps: higher bar wins, they never stack. */
-.vs { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 7px; }
-
-.vs-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-variant-numeric: tabular-nums;
-  opacity: .55;
-  transition: opacity .22s ease;
-}
-
-.vs-row.win { opacity: 1; }
-
-.vs-name {
-  flex: 0 0 64px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.vs-bar {
-  flex: 1;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--ground);
-  border: 1px solid var(--hairline);
-  overflow: hidden;
-}
-
-.vs-bar div {
-  height: 100%;
-  background: var(--muted);
-  border-radius: inherit;
-  transition: width .4s cubic-bezier(.2,.8,.3,1);
-}
-
-.vs-row.win .vs-bar div { background: linear-gradient(90deg, var(--gold), var(--accent)); }
-
-.vs-num { flex: 0 0 30px; text-align: right; font-size: 16px; font-weight: 700; color: var(--ink); }
-
-.total-lesson {
-  margin: 0;
-  max-width: 42ch;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--muted);
-}
-
-.total-lesson b { color: var(--ink); font-weight: 600; }
-.total-lesson s { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
 
 /* ---- collapsible detail ---- */
 
@@ -846,7 +773,6 @@ footer a:hover { text-decoration-color: var(--accent-ink); }
   .lane-label span { font-size: 10.5px; }
   .lane-label b { font-size: 14px; }
   .mk { width: 25px; height: 25px; margin: -12.5px 0 0 -12.5px; font-size: 10px; }
-  .total-value { font-size: 33px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

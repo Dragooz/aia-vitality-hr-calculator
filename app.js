@@ -63,7 +63,6 @@ const stepsNextEl = document.getElementById("steps-next");
 const tabHrPtsEl = document.getElementById("tab-hr-pts");
 const tabStepsPtsEl = document.getElementById("tab-steps-pts");
 const tabEls = [...document.querySelectorAll(".tab")];
-const totalEl = document.getElementById("total");
 
 const nf = new Intl.NumberFormat("en-MY");
 
@@ -270,9 +269,9 @@ function renderTrack(age, bpm, mins, points) {
 
   nextEl.innerHTML = next;
   trackEl.innerHTML = `
-    <div class="row-label">Avg heart rate (bpm)</div>
+    <div class="row-label">Heart rate</div>
     ${gauge}
-    <div class="row-label">Intensity (% of max) &middot; bpm target</div>
+    <div class="row-label">Intensity</div>
     <div class="lanes">${lanes}</div>
     <div class="axis-wrap"><div class="axis">${axis}</div><div class="axis-title">Minutes &rarr;</div></div>
     ${legend(true)}`;
@@ -284,6 +283,7 @@ const STEP_MAX = 15000;
 const stepX = s => Math.min(100, (s / STEP_MAX) * 100);
 
 function renderSteps(steps, hrPoints) {
+  // hrPoints: used only to mark which tab wins.
   const has = steps !== null;
   const pts = has ? stepPoints(steps) : 0;
 
@@ -318,47 +318,17 @@ function renderSteps(steps, hrPoints) {
     <div class="axis-wrap solo"><div class="axis">${axis}</div><div class="axis-title">Steps &rarr;</div></div>
     ${legend(false)}`;
 
-  renderTotal(hrPoints, has ? pts : 0, has);
+  markWinner(hrPoints, pts);
   return pts;
 }
 
-/* ---------- daily total ---------- */
+/* ---------- higher score wins ---------- */
 
-function renderTotal(hrPoints, stepPts, hasSteps) {
-  // Heart rate and step points do NOT stack. AIA pays the higher of the two.
-  const awarded = Math.max(hrPoints, stepPts);
-  const naive = hrPoints + stepPts;
-  const bothEarned = hrPoints > 0 && stepPts > 0;
-  const hrWins = hrPoints >= stepPts;
-
-  const bars = `
-    <div class="vs">
-      <div class="vs-row ${hrWins && awarded > 0 ? "win" : ""}">
-        <span class="vs-name">Workout</span>
-        <div class="vs-bar"><div style="width:${(hrPoints / 150) * 100}%"></div></div>
-        <span class="vs-num">${hrPoints}</span>
-      </div>
-      <div class="vs-row ${!hrWins && awarded > 0 ? "win" : ""}">
-        <span class="vs-name">Steps</span>
-        <div class="vs-bar"><div style="width:${(stepPts / 150) * 100}%"></div></div>
-        <span class="vs-num">${hasSteps ? stepPts : "—"}</span>
-      </div>
-    </div>`;
-
-  const lesson = bothEarned
-    ? `<p class="total-lesson">AIA gives the <b>higher</b> value, not <s>${naive}</s>.</p>`
-    : awarded > 0
-      ? `<p class="total-lesson">AIA gives the <b>higher</b> value. It does not add them.</p>`
-      : `<p class="total-lesson">No points yet. Get 5,000 steps or the first workout tier.</p>`;
-
-  totalEl.innerHTML = `
-    <div class="total-head">
-      <span class="total-label">Today you earn</span>
-      <span class="total-value ${awarded === 0 ? "zero" : ""}">${awarded}</span>
-      <span class="total-unit">/ 150</span>
-    </div>
-    ${bars}
-    ${lesson}`;
+// Points never stack, so mark the tab whose score AIA actually pays.
+function markWinner(hrPoints, stepPts) {
+  const best = Math.max(hrPoints, stepPts);
+  tabHrPtsEl.classList.toggle("win", best > 0 && hrPoints === best);
+  tabStepsPtsEl.classList.toggle("win", best > 0 && stepPts === best && hrPoints !== best);
 }
 
 /* ---------- main ---------- */
