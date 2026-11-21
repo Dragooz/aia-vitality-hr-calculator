@@ -3,10 +3,10 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>AIA Vitality Heart Rate Points Calculator &amp; Guide</title>
+        <title>AIA Vitality Points Calculator: Heart Rate &amp; Steps (Malaysia)</title>
         <meta
             name="description"
-            content="Enter your age, heart rate and workout length to see how many AIA Vitality heart rate points you earned, plus step points and your daily total."
+            content="Free AIA Vitality points calculator and guide for Malaysia. See if your workout earns 50, 100 or 150 points, your age-related max heart rate, how many steps earn points, and your Weekly Challenge target."
         />
         <meta name="theme-color" content="#D31145" />
 
@@ -44,11 +44,11 @@
         <meta property="og:type" content="website" />
         <meta
             property="og:title"
-            content="AIA Vitality Heart Rate Points Calculator"
+            content="AIA Vitality Points Calculator: Heart Rate &amp; Steps"
         />
         <meta
             property="og:description"
-            content="Your age, heart rate and workout length in. Your points out."
+            content="Enter your age, average heart rate and workout minutes. See your AIA Vitality points, and the heart rate you need for 150."
         />
         <meta
             property="og:image"
@@ -62,6 +62,18 @@
         />
         <meta property="og:locale" content="en_MY" />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta
+            name="twitter:title"
+            content="AIA Vitality Points Calculator: Heart Rate &amp; Steps"
+        />
+        <meta
+            name="twitter:description"
+            content="Enter your age, average heart rate and workout minutes. See your AIA Vitality points, and the heart rate you need for 150."
+        />
+        <meta
+            name="twitter:image"
+            content="https://aia-vitality-hr-calculator.dragooz.com/assets/og-image.png"
+        />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -110,6 +122,22 @@
                     },
                     {
                         "@type": "Question",
+                        "name": "How many steps do I need to earn AIA Vitality points?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "5,000 to 7,499 steps earn 25 points, 7,500 to 12,499 steps earn 50 points, and 12,500 steps or more earn 100 points. Steps cannot reach 150 points in a day; only a heart rate workout can."
+                        }
+                    },
+                    {
+                        "@type": "Question",
+                        "name": "What is the AIA Vitality Weekly Challenge target?",
+                        "acceptedAnswer": {
+                            "@type": "Answer",
+                            "text": "Everyone starts at 150 points a week. From 1 September 2025, AIA Malaysia adjusts your personal target between 150 and 300 points based on your activity and past completions. Hitting it earns a RM5 reward. Check the AIA+ app every Monday for your target."
+                        }
+                    },
+                    {
+                        "@type": "Question",
                         "name": "Why did I only get 50 points instead of 100?",
                         "acceptedAnswer": {
                             "@type": "Answer",
@@ -147,7 +175,11 @@
             {
                 "@context": "https://schema.org",
                 "@type": "WebApplication",
-                "name": "AIA Vitality Heart Rate Calculator",
+                "name": "AIA Vitality Points Calculator",
+                "alternateName": "AIA Vitality Heart Rate Points Calculator",
+                "url": "https://aia-vitality-hr-calculator.dragooz.com/",
+                "inLanguage": "en-MY",
+                "dateModified": "2026-11-21",
                 "applicationCategory": "HealthApplication",
                 "operatingSystem": "Any",
                 "isAccessibleForFree": true,
@@ -156,7 +188,7 @@
                     "name": "Yi Chong Goh",
                     "url": "https://www.yichonggoh.com/"
                 },
-                "description": "Enter your age, heart rate and workout length to see the AIA Vitality heart rate points you earned.",
+                "description": "Unofficial calculator for AIA Vitality heart rate and step points. Enter your age, average heart rate and workout minutes to see the points you earned.",
                 "offers": {
                     "@type": "Offer",
                     "price": "0",
@@ -175,8 +207,9 @@
                     width="34"
                     height="34"
                 />
-                <h1>AIA Vitality heart rate points</h1>
+                <h1>AIA Vitality points calculator</h1>
             </header>
+            <p class="lede">Work out your AIA Vitality heart rate and step points the way AIA Malaysia counts them. Free, unofficial, and nothing leaves your browser.</p>
 
             <div class="tabs" role="tablist" aria-label="Points type">
                 <button class="tab" role="tab" id="tab-hr" aria-controls="panel-hr" aria-selected="true" data-tab="hr">
@@ -239,14 +272,21 @@
             </div>
 
 
-            <details id="detail">
-                <summary>How AIA counts these points</summary>
+            <article class="guide" aria-labelledby="guide-title">
                 <div class="detail-body">
-                    <h3>Heart rate</h3>
+                    <h2 id="guide-title">How to calculate AIA Vitality points</h2>
                     <p>AIA gives points for <b>one workout each day</b>. Two values set the points: your <b>average heart rate</b> and the <b>duration</b> of the workout.</p>
-                    <p>Your maximum heart rate is <b>220 minus your age</b>.</p>
+                    <ol>
+                        <li>Find your maximum heart rate: <b>220 minus your age</b>.</li>
+                        <li>Work out 60%, 70% and 80% of it. <b>Round up</b> to the next whole bpm.</li>
+                        <li>Check which percentage your <b>average</b> heart rate reached.</li>
+                        <li>Look up the minutes in the table below. AIA gives the highest tier you reach.</li>
+                    </ol>
+                    <p><b>Example:</b> you are 30, so your maximum is 190&nbsp;bpm. The targets are 114&nbsp;bpm (60%), 133&nbsp;bpm (70%) and 152&nbsp;bpm (80%). A 35-minute run at an average of 145&nbsp;bpm reaches 70% for 30 minutes or more. You earn <b>100 points</b>.</p>
 
+                    <h2>AIA Vitality heart rate points table</h2>
                     <table class="tiers">
+                        <caption>Minutes needed at each % of maximum heart rate</caption>
                         <thead>
                             <tr><th>Points</th><th>60%</th><th>70%</th><th>80%</th></tr>
                         </thead>
@@ -264,23 +304,87 @@
                         <li><b>AIA counts only your best workout each day.</b></li>
                     </ul>
 
-                    <h3>Steps</h3>
-                    <p><b>5,000</b> steps: 25 points. <b>7,500</b> steps: 50 points. <b>12,500</b> steps: 100 points.</p>
+                    <h2>AIA Vitality age-related max heart rate</h2>
+                    <p>AIA sets your targets as a percentage of your <b>age-related maximum heart rate</b>: 220 minus your age. The table shows the average heart rate (bpm) you need to hold, rounded up the way AIA does. For other ages, use the calculator above.</p>
+                    <table class="tiers by-age">
+                        <thead>
+                            <tr><th>Age</th><th>Max</th><th>60%</th><th>70%</th><th>80%</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>20</td><td>200</td><td>120</td><td>140</td><td>160</td></tr>
+                            <tr><td>25</td><td>195</td><td>117</td><td>137</td><td>156</td></tr>
+                            <tr><td>30</td><td>190</td><td>114</td><td>133</td><td>152</td></tr>
+                            <tr><td>35</td><td>185</td><td>111</td><td>130</td><td>148</td></tr>
+                            <tr><td>40</td><td>180</td><td>108</td><td>126</td><td>144</td></tr>
+                            <tr><td>45</td><td>175</td><td>105</td><td>123</td><td>140</td></tr>
+                            <tr><td>50</td><td>170</td><td>102</td><td>119</td><td>136</td></tr>
+                            <tr><td>55</td><td>165</td><td>99</td><td>116</td><td>132</td></tr>
+                            <tr><td>60</td><td>160</td><td>96</td><td>112</td><td>128</td></tr>
+                            <tr><td>65</td><td>155</td><td>93</td><td>109</td><td>124</td></tr>
+                            <tr><td>70</td><td>150</td><td>90</td><td>105</td><td>120</td></tr>
+                        </tbody>
+                    </table>
 
-                    <h3>Points do not add</h3>
-                    <p>The daily maximum is <b>150 points</b>. AIA gives the higher of your workout points and your step points. It does not add them.</p>
+                    <h2>How to get 100 or 150 points in AIA Vitality</h2>
+                    <p>Pick the option that suits your workout. The examples are for a 35-year-old (maximum 185&nbsp;bpm).</p>
+                    <ul>
+                        <li><b>100 points:</b> 20 minutes at 148&nbsp;bpm (80%), 30 minutes at 130&nbsp;bpm (70%), or 60 minutes at 111&nbsp;bpm (60%).</li>
+                        <li><b>150 points:</b> 30 minutes at 148&nbsp;bpm (80%), 60 minutes at 130&nbsp;bpm (70%), or 90 minutes at 111&nbsp;bpm (60%).</li>
+                        <li><b>Easiest 150:</b> a hard 30-minute run or class at 80%, or a long 90-minute brisk walk, ride or hike at 60%.</li>
+                        <li>Steps alone top out at <b>100 points</b> a day. Only a heart rate workout earns 150.</li>
+                    </ul>
 
-                    <h3>Yearly limits</h3>
-                    <p>Heart rate: <b>15,000</b> points each membership year. Steps: <b>10,000</b> points each membership year.</p>
+                    <h2>How many steps to earn AIA Vitality points</h2>
+                    <table class="tiers">
+                        <thead>
+                            <tr><th>Points</th><th>Steps in a day</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>25</td><td>5,000 &ndash; 7,499</td></tr>
+                            <tr><td>50</td><td>7,500 &ndash; 12,499</td></tr>
+                            <tr><td>100</td><td>12,500 or more</td></tr>
+                        </tbody>
+                    </table>
+                    <p>Step points count toward your Vitality status up to <b>10,000</b> points each membership year. After that, steps still count toward your Weekly Challenge.</p>
 
-                    <h3>If your watch shows different zones</h3>
+                    <h2>Do heart rate and step points add up?</h2>
+                    <p>No. The daily maximum is <b>150 points</b>. AIA gives the higher of your workout points and your step points. It does not add them.</p>
+
+                    <h2>Yearly limits</h2>
+                    <p>Heart rate and physical activity: <b>15,000</b> points each membership year. Steps: <b>10,000</b> points each membership year.</p>
+
+                    <h2>AIA Vitality Weekly Challenge target</h2>
+                    <p>Everyone starts at <b>150 points</b> a week. From 1 September 2025, AIA adjusts your personal target between <b>150 and 300 points</b>, based on your activity and how often you completed past challenges. Your target can go down as well as up.</p>
+                    <ul>
+                        <li>Hit the target to earn a <b>RM5</b> reward in the AIA+ app.</li>
+                        <li>Check the AIA+ app every Monday for this week&rsquo;s target.</li>
+                        <li>You must complete the <b>About You</b> assessment once each membership year to unlock rewards.</li>
+                        <li>A 150-point target takes one 150-point workout, or two 100-point days. A 300-point target takes two 150-point workouts.</li>
+                    </ul>
+
+                    <h2>If your watch shows different zones</h2>
                     <p>Your watch can calculate a different maximum heart rate. AIA uses 220 minus your age. Use the targets on this page for points.</p>
 
+                    <h2>Common questions</h2>
+                    <h3>Why did I only get 50 points instead of 100?</h3>
+                    <p>Usually the session average fell below the threshold, or the session ran short. AIA uses the average across the whole workout, not your peak.</p>
+                    <h3>Does AIA Vitality use average or peak heart rate?</h3>
+                    <p>Average, across a single session. A short sprint that lifts your peak does not qualify the session if the average stays below the threshold.</p>
+                    <h3>Do two short walks count as one session?</h3>
+                    <p>No. Two 15-minute walks are two sessions of 15 minutes, so neither reaches the 30-minute threshold.</p>
+                    <h3>What heart rate do I need for 150 points?</h3>
+                    <p>30 minutes at 80% of your maximum, 60 minutes at 70%, or 90 minutes at 60%. For a 35-year-old with a 185&nbsp;bpm maximum, that is 30 minutes at 148&nbsp;bpm, 60 minutes at 130&nbsp;bpm, or 90 minutes at 111&nbsp;bpm.</p>
+                    <h3>Do manually added workouts earn points?</h3>
+                    <p>No. AIA awards points only for workouts your fitness app or device records automatically, and only from one linked device.</p>
+                    <h3>How many heart rate points can I earn in a day?</h3>
+                    <p>Heart rate points are awarded once per day. If your tracker captures more than one workout, AIA awards the workout worth the most points, not the total.</p>
+
                     <p class="src">Source: AIA&rsquo;s
-                        <a href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html" target="_blank" rel="noopener">Dynamic Weekly Challenge page</a>, checked 6 September 2026.
+                        <a href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html" target="_blank" rel="noopener">Dynamic Weekly Challenge</a> and
+                        <a href="https://www.aia.com.my/en/aia-vitality/how-it-works/improve-your-health.html" target="_blank" rel="noopener">Improve Your Health</a> pages, checked 21 November 2026.
                     </p>
                 </div>
-            </details>
+            </article>
 
             <footer>
                 <p>
@@ -294,8 +398,8 @@
                     a feature? Get in touch there.
                 </p>
                 <p>
-                    Your numbers stay in your browser &middot; Not medical
-                    advice &middot;
+                    Unofficial tool, not made by AIA &middot; Your numbers stay
+                    in your browser &middot; Not medical advice &middot;
                     <a
                         href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html"
                         target="_blank"
