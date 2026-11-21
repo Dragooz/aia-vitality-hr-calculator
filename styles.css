@@ -272,31 +272,18 @@ input[type="number"]:focus-visible {
 
 /* ---- timelines (workout + steps) ---- */
 
-.track-card {
-  background: var(--surface);
-  border: 1px solid var(--hairline);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 16px 18px 12px;
+/* Timeline sits inside the result card, under the big number. */
+.track {
+  text-align: left;
+  margin-top: 16px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--hairline);
 }
 
-.track-card:empty { display: none; }
+.track:empty { display: none; }
 
-.track-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.track-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
+.next-wrap { margin-top: 12px; }
+.next-wrap:empty { display: none; }
 
 .next {
   font-size: 13px;
@@ -395,7 +382,7 @@ input[type="number"]:focus-visible {
 }
 
 /* minute lanes */
-.track-card, .steps-track { --lab-w: 92px; }
+.track { --lab-w: 92px; }
 
 .lanes { display: flex; flex-direction: column; gap: 6px; }
 
@@ -558,55 +545,62 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
-/* ---- steps: secondary to heart rate ---- */
+/* ---- tabs ---- */
 
-.steps-card {
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  padding: 4px;
   background: var(--surface);
   border: 1px solid var(--hairline);
   border-radius: 12px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
+  box-shadow: var(--shadow);
 }
 
-.steps-row {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
-}
-
-.steps-row .field { flex-shrink: 0; }
-.steps-row input[type="number"] { width: 130px; font-size: 21px; }
-
-.steps-out {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  padding-bottom: 9px;
-  flex-wrap: wrap;
-}
-
-.steps-pts {
-  font-size: 27px;
+.tab {
+  font: inherit;
+  font-size: 15px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  letter-spacing: -.02em;
-  color: var(--accent-ink);
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color .18s ease, color .18s ease;
 }
 
-.steps-pts.zero { color: var(--muted); opacity: .5; }
+.tab:hover { color: var(--ink); }
 
-.steps-note { font-size: 13px; color: var(--muted); }
+.tab[aria-selected="true"] {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
 
-.steps-track { padding: 2px 0 0; }
-.steps-track .lane { padding-left: 14px; }
-.steps-track .axis-wrap { padding-left: 14px; }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.tab-pts {
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--ground);
+  border: 1px solid var(--hairline);
+  color: var(--ink);
+  min-width: 30px;
+}
+
+.panel { display: flex; flex-direction: column; gap: 22px; }
+.panel[hidden] { display: none; }
+
+#panel-steps .field { max-width: 220px; }
 
 .total {
-  padding-top: 14px;
-  border-top: 1px dashed var(--hairline);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -760,6 +754,21 @@ summary:focus-visible {
 .detail-body b { color: var(--ink); font-weight: 600; }
 .detail-body h3 { margin: 6px 0 -4px; font-size: 15px; color: var(--ink); }
 .detail-body a { color: var(--accent-ink); }
+.detail-body ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.detail-body .src { font-size: 12.5px; }
+
+.tiers {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.tiers th, .tiers td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); }
+.tiers th { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.tiers td:first-child { font-weight: 700; color: var(--accent-ink); }
+.tiers td { color: var(--ink); }
 
 /* ---- footer ---- */
 
@@ -787,15 +796,12 @@ footer a:hover { text-decoration-color: var(--accent-ink); }
   .ask .field:first-child { grid-column: 1 / -1; }
   .result-points { font-size: 60px; }
   input[type="number"] { font-size: 23px; }
-  .track-card { padding: 14px 14px 10px; }
-  .track-card, .steps-track { --lab-w: 70px; }
+  .result { padding: 22px 14px 14px; }
+  .track { --lab-w: 70px; }
   .lane-label { flex-wrap: wrap; column-gap: 4px; row-gap: 0; }
   .lane-label span { font-size: 10.5px; }
   .lane-label b { font-size: 14px; }
   .mk { width: 25px; height: 25px; margin: -12.5px 0 0 -12.5px; font-size: 10px; }
-  .steps-row { flex-direction: column; align-items: stretch; gap: 11px; }
-  .steps-row input[type="number"] { width: 100%; }
-  .steps-out { padding-bottom: 0; }
   .total-value { font-size: 33px; }
 }
 

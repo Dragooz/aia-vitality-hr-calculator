@@ -58,6 +58,11 @@ const resultEl = document.getElementById("result");
 const stepsEl = document.getElementById("steps");
 const stepsPtsEl = document.getElementById("steps-pts");
 const stepsTrackEl = document.getElementById("steps-track");
+const nextEl = document.getElementById("next");
+const stepsNextEl = document.getElementById("steps-next");
+const tabHrPtsEl = document.getElementById("tab-hr-pts");
+const tabStepsPtsEl = document.getElementById("tab-steps-pts");
+const tabEls = [...document.querySelectorAll(".tab")];
 const totalEl = document.getElementById("total");
 
 const nf = new Intl.NumberFormat("en-MY");
@@ -78,6 +83,7 @@ function restore() {
     for (const el of FIELDS) {
       if (typeof saved[el.id] === "string") el.value = saved[el.id];
     }
+    if (saved.tab === "hr" || saved.tab === "steps") showTab(saved.tab);
   } catch (_) { /* storage blocked or corrupt: keep defaults */ }
 }
 
@@ -85,6 +91,7 @@ function save() {
   try {
     const data = {};
     for (const el of FIELDS) data[el.id] = el.value;
+    data.tab = activeTab;
     localStorage.setItem(STORE_KEY, JSON.stringify(data));
   } catch (_) { /* private mode etc. */ }
 }
@@ -243,8 +250,8 @@ function renderTrack(age, bpm, mins, points) {
     next = `<span class="next">Next <b>${nextTier.points}</b> &rarr; ${bits.join(" · ")}</span>`;
   }
 
+  nextEl.innerHTML = next;
   trackEl.innerHTML = `
-    <div class="track-head"><span class="track-title">Workout</span>${next}</div>
     <div class="row-label">bpm</div>
     ${gauge}
     <div class="row-label">minutes</div>
@@ -263,6 +270,7 @@ function renderSteps(steps, hrPoints) {
 
   stepsPtsEl.textContent = has ? pts : "—";
   stepsPtsEl.classList.toggle("zero", pts === 0);
+  tabStepsPtsEl.textContent = has ? pts : "—";
 
   const next = has ? [...STEP_TIERS].reverse().find(t => steps < t.min) : null;
   const marks = [...STEP_TIERS].reverse().map(t => {
@@ -279,8 +287,8 @@ function renderSteps(steps, hrPoints) {
     : next ? `<span class="next">Next <b>${next.points}</b> &rarr; +${nf.format(next.min - steps)}</span>`
            : `<span class="next done">Max tier &#9733;</span>`;
 
+  stepsNextEl.innerHTML = label;
   stepsTrackEl.innerHTML = `
-    <div class="track-head"><span class="track-title">Steps</span>${label}</div>
     <div class="lane ok solo">
       <div class="lane-bar">
         <div class="lane-fill" style="width:${has ? stepX(steps) : 0}%"></div>
@@ -318,10 +326,10 @@ function renderTotal(hrPoints, stepPts, hasSteps) {
     </div>`;
 
   const lesson = bothEarned
-    ? `<p class="total-lesson"><b>Higher one wins</b> &mdash; not <s>${naive}</s>.</p>`
+    ? `<p class="total-lesson">AIA gives the <b>higher</b> value, not <s>${naive}</s>.</p>`
     : awarded > 0
-      ? `<p class="total-lesson">Higher one wins. They never add up.</p>`
-      : `<p class="total-lesson">Nothing yet. 5,000 steps or the first workout tier gets you started.</p>`;
+      ? `<p class="total-lesson">AIA gives the <b>higher</b> value. It does not add them.</p>`
+      : `<p class="total-lesson">No points yet. Get 5,000 steps or the first workout tier.</p>`;
 
   totalEl.innerHTML = `
     <div class="total-head">
@@ -351,13 +359,15 @@ function update() {
     sayEl.textContent = "";
     resultEl.style.setProperty("--fill", 0);
     trackEl.innerHTML = "";
+    nextEl.innerHTML = "";
+    tabHrPtsEl.textContent = "—";
     renderSteps(steps, 0);
     return;
   }
 
   const maxHr = 220 - age;
   hintEl.classList.remove("warn");
-  hintEl.innerHTML = `Max <b>${maxHr} bpm</b> (220 &minus; age). Targets round up: hit the number shown or higher.`;
+  hintEl.innerHTML = `Maximum: <b>${maxHr} bpm</b> (220 minus age). Targets round up.`;
 
   if (bpm === null || mins === null) {
     pointsEl.textContent = "—";
@@ -366,6 +376,7 @@ function update() {
       ? "Enter the average heart rate your watch recorded."
       : "Enter how long the workout lasted.";
     resultEl.style.setProperty("--fill", 0);
+    tabHrPtsEl.textContent = "—";
     renderTrack(age, bpm, mins, 0);
     renderSteps(steps, 0);
     return;
@@ -383,6 +394,7 @@ function update() {
   }
 
   pointsEl.textContent = points;
+  tabHrPtsEl.textContent = points;
   pointsEl.classList.toggle("zero", points === 0);
   resultEl.style.setProperty("--fill", points / 150);
   sayEl.innerHTML = `<b>${mins} min</b> · <b>${bpm} bpm</b> · <b>${pctOfMax}%</b> of max`;
@@ -390,6 +402,30 @@ function update() {
   renderTrack(age, bpm, mins, points);
   renderSteps(steps, points);
 }
+
+/* ---------- tabs ---------- */
+
+let activeTab = "hr";
+
+function showTab(name) {
+  activeTab = name;
+  for (const t of tabEls) {
+    const on = t.dataset.tab === name;
+    t.setAttribute("aria-selected", on ? "true" : "false");
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+  }
+}
+
+tabEls.forEach((t, i) => {
+  t.addEventListener("click", () => { showTab(t.dataset.tab); save(); });
+  // Arrow keys move between tabs, per the WAI-ARIA tabs pattern.
+  t.addEventListener("keydown", e => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const n = tabEls[(i + (e.key === "ArrowRight" ? 1 : tabEls.length - 1)) % tabEls.length];
+    showTab(n.dataset.tab); n.focus(); save();
+  });
+});
 
 restore();
 FIELDS.forEach(el => el.addEventListener("input", () => { save(); update(); }));

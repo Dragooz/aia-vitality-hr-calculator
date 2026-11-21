@@ -178,173 +178,106 @@
                 <h1>AIA Vitality heart rate points</h1>
             </header>
 
-            <section class="card">
-                <div class="ask">
+            <div class="tabs" role="tablist" aria-label="Points type">
+                <button class="tab" role="tab" id="tab-hr" aria-controls="panel-hr" aria-selected="true" data-tab="hr">
+                    Heart rate <span class="tab-pts" id="tab-hr-pts">—</span>
+                </button>
+                <button class="tab" role="tab" id="tab-steps" aria-controls="panel-steps" aria-selected="false" data-tab="steps" tabindex="-1">
+                    Steps <span class="tab-pts" id="tab-steps-pts">—</span>
+                </button>
+            </div>
+
+            <div class="panel" role="tabpanel" id="panel-hr" aria-labelledby="tab-hr">
+                <section class="card">
+                    <div class="ask">
                     <div class="field">
                         <label for="age">Your age</label>
-                        <input
-                            type="number"
-                            id="age"
-                            min="13"
-                            max="100"
-                            step="1"
-                            value="30"
-                            inputmode="numeric"
-                        / aria-describedby="age-msg">
-        <p class="msg" id="age-msg" role="status"></p>
+                        <input type="number" id="age" min="13" max="100" step="1" value="30" inputmode="numeric" aria-describedby="age-msg" />
+                        <p class="msg" id="age-msg" role="status"></p>
                     </div>
                     <div class="field">
                         <label for="bpm">Avg heart rate</label>
-                        <input
-                            type="number"
-                            id="bpm"
-                            min="40"
-                            max="230"
-                            step="1"
-                            value="145"
-                            inputmode="numeric"
-                        / aria-describedby="bpm-msg">
-        <p class="msg" id="bpm-msg" role="status"></p>
+                        <input type="number" id="bpm" min="40" max="230" step="1" value="145" inputmode="numeric" aria-describedby="bpm-msg" />
+                        <p class="msg" id="bpm-msg" role="status"></p>
                     </div>
                     <div class="field">
                         <label for="mins">Minutes</label>
-                        <input
-                            type="number"
-                            id="mins"
-                            min="1"
-                            max="600"
-                            step="1"
-                            value="35"
-                            inputmode="numeric"
-                        / aria-describedby="mins-msg">
-        <p class="msg" id="mins-msg" role="status"></p>
+                        <input type="number" id="mins" min="1" max="600" step="1" value="35" inputmode="numeric" aria-describedby="mins-msg" />
+                        <p class="msg" id="mins-msg" role="status"></p>
                     </div>
-                </div>
-                <p class="hint" id="hint"></p>
-            </section>
+                    </div>
+                    <p class="hint" id="hint"></p>
+                </section>
 
-            <section class="result" id="result">
-                <div class="result-label">You earned</div>
-                <div class="result-points" id="points">100</div>
-                <div class="result-unit">Vitality points</div>
-                <p class="result-say" id="say"></p>
-            </section>
+                <section class="result" id="result">
+                    <div class="result-label">You earned</div>
+                    <div class="result-points" id="points">—</div>
+                    <div class="result-unit">Vitality points</div>
+                    <p class="result-say" id="say"></p>
+                    <div class="next-wrap" id="next"></div>
+                    <div class="track" id="track" aria-label="Workout timeline"></div>
+                </section>
+            </div>
 
-            <section class="track-card" id="track" aria-label="Workout timeline"></section>
-
-            <section class="steps-card">
-                <div class="steps-row">
+            <div class="panel" role="tabpanel" id="panel-steps" aria-labelledby="tab-steps" hidden>
+                <section class="card">
                     <div class="field">
                         <label for="steps">Steps today</label>
-                        <input
-                            type="number"
-                            id="steps"
-                            min="0"
-                            max="100000"
-                            step="100"
-                            value="8000"
-                            inputmode="numeric"
-                        / aria-describedby="steps-msg">
-        <p class="msg" id="steps-msg" role="status"></p>
+                        <input type="number" id="steps" min="0" max="100000" step="100" value="8000" inputmode="numeric" aria-describedby="steps-msg" />
+                        <p class="msg" id="steps-msg" role="status"></p>
                     </div>
-                    <div class="steps-out">
-                        <div class="steps-pts" id="steps-pts">50</div>
-                        <div class="steps-note">points</div>
-                    </div>
-                </div>
-                <div class="steps-track" id="steps-track" aria-label="Steps timeline"></div>
-                <div class="total" id="total"></div>
-            </section>
+                </section>
+
+                <section class="result" id="steps-result">
+                    <div class="result-label">You earned</div>
+                    <div class="result-points" id="steps-pts">—</div>
+                    <div class="result-unit">Vitality points</div>
+                    <div class="next-wrap" id="steps-next"></div>
+                    <div class="track" id="steps-track" aria-label="Steps timeline"></div>
+                </section>
+            </div>
+
+            <section class="total card" id="total"></section>
 
             <details id="detail">
                 <summary>How AIA counts these points</summary>
                 <div class="detail-body">
-                    <p>
-                        AIA pays out on <b>one workout per day</b>. Two numbers
-                        decide the tier: your <b>average</b> heart rate for that
-                        session as a share of your age-related maximum, and
-                        <b>how long</b> you hold it. Distance, calories and
-                        sport type do not matter.
-                    </p>
+                    <h3>Heart rate</h3>
+                    <p>AIA gives points for <b>one workout each day</b>. Two values set the points: your <b>average heart rate</b> and the <b>duration</b> of the workout.</p>
+                    <p>Your maximum heart rate is <b>220 minus your age</b>.</p>
 
-                    <p>
-                        Your maximum is <b>220 minus your age</b>. At 40 that is
-                        180&nbsp;bpm, so 60% is 108&nbsp;bpm, 70% is
-                        126&nbsp;bpm and 80% is 144&nbsp;bpm.
-                    </p>
+                    <table class="tiers">
+                        <thead>
+                            <tr><th>Points</th><th>60%</th><th>70%</th><th>80%</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>50</td><td>30 min</td><td>&mdash;</td><td>10 min</td></tr>
+                            <tr><td>100</td><td>60 min</td><td>30 min</td><td>20 min</td></tr>
+                            <tr><td>150</td><td>90 min</td><td>60 min</td><td>30 min</td></tr>
+                        </tbody>
+                    </table>
 
-                    <p>
-                        <b>Targets always round up.</b> At 27 your max is
-                        193&nbsp;bpm, so 70% is 135.1. AIA does not count
-                        135&nbsp;bpm; you need <b>136</b>. The targets here are
-                        already rounded up for you.
-                    </p>
-
-                    <h3>Three things that catch people out</h3>
-
-                    <p>
-                        <b>It is the average, not the peak.</b> A five-minute
-                        push to 160&nbsp;bpm inside a 40-minute walk will not
-                        lift the session average past 70%.
-                    </p>
-
-                    <p>
-                        <b>One session, unbroken.</b> A 15-minute walk in the
-                        morning and another after dinner are two 15-minute
-                        sessions. Neither reaches 30 minutes.
-                    </p>
-
-                    <p>
-                        <b>Only your best workout counts each day.</b> A
-                        150-point run and a 50-point walk on the same day is 150
-                        points, not 200.
-                    </p>
+                    <ul>
+                        <li><b>Targets round up.</b> At age 27, 70% is 135.1&nbsp;bpm. You must get 136&nbsp;bpm.</li>
+                        <li><b>AIA uses the average, not the peak.</b> A short sprint does not lift a slow workout.</li>
+                        <li><b>Do not stop the workout.</b> Two 15-minute walks are two workouts, not one 30-minute workout.</li>
+                        <li><b>AIA counts only your best workout each day.</b></li>
+                    </ul>
 
                     <h3>Steps</h3>
+                    <p><b>5,000</b> steps: 25 points. <b>7,500</b> steps: 50 points. <b>12,500</b> steps: 100 points.</p>
 
-                    <p>
-                        <b>5,000&ndash;7,499</b> steps is 25 points,
-                        <b>7,500&ndash;12,499</b> is 50 points, and
-                        <b>12,500 or more</b> is 100 points.
-                    </p>
+                    <h3>Points do not add</h3>
+                    <p>The daily maximum is <b>150 points</b>. AIA gives the higher of your workout points and your step points. It does not add them.</p>
 
-                    <h3>Points do not stack</h3>
+                    <h3>Yearly limits</h3>
+                    <p>Heart rate: <b>15,000</b> points each membership year. Steps: <b>10,000</b> points each membership year.</p>
 
-                    <p>
-                        <b>150 points a day is the ceiling</b>, and you have to
-                        earn it from a single achievement. Walking 12,500 steps
-                        <i>and</i> doing a 150-point workout still pays 150 for
-                        the day, not 250. Each target has to be met on its own
-                        &mdash; part-way towards two of them adds up to nothing
-                        extra.
-                    </p>
+                    <h3>If your watch shows different zones</h3>
+                    <p>Your watch can calculate a different maximum heart rate. AIA uses 220 minus your age. Use the targets on this page for points.</p>
 
-                    <h3>Yearly caps</h3>
-
-                    <p>
-                        Heart rate and physical activity points cap at
-                        <b>15,000 per membership year</b>. Steps cap separately
-                        at <b>10,000</b>.
-                    </p>
-
-                    <h3>If your watch disagrees</h3>
-
-                    <p>
-                        Garmin, Apple and Fitbit often estimate a personal
-                        maximum from your training history, which can sit
-                        10&ndash;20&nbsp;bpm either side of 220 minus age. AIA
-                        scores against the formula, so use these targets for
-                        points and your watch's zones for training.
-                    </p>
-
-                    <p>
-                        Thresholds and the formula come from AIA&rsquo;s
-                        <a
-                            href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html"
-                            target="_blank"
-                            rel="noopener"
-                            >Dynamic Weekly Challenge page</a
-                        >, checked 6 September 2026.
+                    <p class="src">Source: AIA&rsquo;s
+                        <a href="https://www.aia.com.my/en/aia-vitality/member-exclusive/announcement/dynamic-weekly-challenge.html" target="_blank" rel="noopener">Dynamic Weekly Challenge page</a>, checked 6 September 2026.
                     </p>
                 </div>
             </details>
