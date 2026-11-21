@@ -157,24 +157,6 @@ function stepPoints(steps) {
   return 0;
 }
 
-/* ---------- chart legend ---------- */
-
-function legend(hr) {
-  const item = (swatch, text) => `<span class="lg-item">${swatch}<span>${text}</span></span>`;
-  const items = [
-    item(`<span class="mk lg won">50</span>`, "Your points"),
-    item(`<span class="mk lg got">25</span>`, "Reached"),
-    item(`<span class="mk lg goal">50</span>`, "Next goal"),
-    item(`<span class="lg-now"></span>`, "You are here"),
-  ];
-  if (hr) {
-    items.push(item(`<span class="lg-hatch"></span>`, "Heart rate too low"));
-    items.push(item(`<span class="chip">+5</span>`, "bpm short"));
-    items.push(item(`<span class="chip ok">&#10003;</span>`, "bpm target met"));
-  }
-  return `<div class="legend" aria-hidden="true">${items.join("")}</div>`;
-}
-
 /* ---------- workout timeline ---------- */
 
 // One lane per intensity, each with its own minute milestones.
@@ -196,35 +178,12 @@ function xPos(mins) {
   return 100;
 }
 
-// Intensity gauge runs 50%-90% of max.
-function gaugePos(bpm, maxHr) {
-  const lo = maxHr * 0.5, hi = maxHr * 0.9;
-  return Math.max(0, Math.min(100, ((bpm - lo) / (hi - lo)) * 100));
-}
-
 function renderTrack(age, bpm, mins, points) {
-  const maxHr = 220 - age;
   const hasBpm = bpm !== null, hasMins = mins !== null;
 
   // The single next goal, so the chart can light it up.
   const nextTier = [...TIERS].reverse().find(t => t.points > points);
   const goal = nextTier && hasBpm && hasMins ? nearestRule(nextTier, age, bpm, mins) : null;
-
-  // Intensity gauge.
-  const ticks = [60, 70, 80].map(pct => {
-    const t = bpmFor(age, pct);
-    const hit = hasBpm && bpm >= t;
-    return `<div class="g-tick ${hit ? "hit" : ""}" style="left:${gaugePos(t, maxHr)}%">
-        <span class="g-pct">${pct}%</span><span class="g-bpm">${t}</span>
-      </div>`;
-  }).join("");
-  const pin = hasBpm
-    ? `<div class="g-pin" style="left:${gaugePos(bpm, maxHr)}%"><span>${bpm}</span></div>`
-    : "";
-  const gauge = `
-    <div class="gauge" aria-hidden="true">
-      <div class="g-bar"><div class="g-fill" style="width:${hasBpm ? gaugePos(bpm, maxHr) : 0}%"></div>${ticks}${pin}</div>
-    </div>`;
 
   // Minute lanes.
   const lanes = LANES.map(lane => {
@@ -269,12 +228,9 @@ function renderTrack(age, bpm, mins, points) {
 
   nextEl.innerHTML = next;
   trackEl.innerHTML = `
-    <div class="row-label">Heart rate</div>
-    ${gauge}
     <div class="row-label">Intensity</div>
     <div class="lanes">${lanes}</div>
-    <div class="axis-wrap"><div class="axis">${axis}</div><div class="axis-title">Minutes &rarr;</div></div>
-    ${legend(true)}`;
+    <div class="axis-wrap"><div class="axis">${axis}</div><div class="axis-title">Minutes &rarr;</div></div>`;
 }
 
 /* ---------- steps timeline ---------- */
@@ -315,8 +271,7 @@ function renderSteps(steps, hrPoints) {
         ${marks}
       </div>
     </div>
-    <div class="axis-wrap solo"><div class="axis">${axis}</div><div class="axis-title">Steps &rarr;</div></div>
-    ${legend(false)}`;
+    <div class="axis-wrap solo"><div class="axis">${axis}</div><div class="axis-title">Steps &rarr;</div></div>`;
 
   markWinner(hrPoints, pts);
   return pts;
